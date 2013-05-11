@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Blog]]></title>
-  <link href="http://shivamd.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Ramblings | My Blog]]></title>
+  <link href="http://shivamd.github.io/blog/categories/ramblings/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
   <updated>2013-05-11T12:52:47-07:00</updated>
   <id>http://shivamd.github.io/</id>
