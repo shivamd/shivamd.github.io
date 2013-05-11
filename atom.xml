@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Blog]]></title>
+  <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-05-11T13:16:10-07:00</updated>
+  <updated>2013-05-11T14:13:16-07:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -18,9 +18,16 @@
     <link href="http://shivamd.github.io/blog/2013/05/11/the-world-is-ready-for-my-thoughts/"/>
     <updated>2013-05-11T12:36:00-07:00</updated>
     <id>http://shivamd.github.io/blog/2013/05/11/the-world-is-ready-for-my-thoughts</id>
-    <content type="html"><![CDATA[<p>I turned around to Stephane and said, &ldquo;I think the world is ready for my thoughts&rdquo;. He said you mean you are ready to expose your thoughts. I thought about that for a second, and realized how true that is. I have been wanting to start a blog since a year now, but I always kept delaying it because I was scared of what people might think. In reality nobody cares about you, all they think about is themselves.</p>
+    <content type="html"><![CDATA[<p>I turned around to Stephane and said, &ldquo;I think the world is ready for my thoughts.&rdquo; He said, you mean you are ready to expose your thoughts to the world. I thought about that for a second, and realized how true that is. I have been wanting to start a blog since a year now, but I kept delaying it because I was afraid about what people might think. In reality nobody cares about you, all they think about is themselves.
+Enough of that bullshit. I have finally reached a state of mind, where I don&rsquo;t mind putting myself out there.</p>
 
-<p>I have finally reached that state of mind, where I don&rsquo;t mind putting myself out there. This blog is mainly going to be about the things I learn and my ramblings.</p>
+<h2>Tell me about Yourself.</h2>
+
+<p>The interview question I dread.
+Recently graduated from high school in Dubai. Wandered for a few months and initially decided to not follow the traditional path of college. Completed Dev Bootcamp, a 9 week intensive course on web development, on April 19th 2013. Currently an aspiring web developer. I love learning and exploring new things.
+This is a brief overview of my journey over the past couple of years, read the whole account here.</p>
+
+<p>My writings are going to be about the things I learn and my ramblings. Mainly about my journey as a software developer.</p>
 ]]></content>
   </entry>
   
