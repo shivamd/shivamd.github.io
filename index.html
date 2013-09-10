@@ -9,7 +9,8 @@
   <meta name="author" content="Shivam Daryanani">
 
   
-  <meta name="description" content="There is a lot of advice thrown out there to people who are just starting out to learn how to program. The learning never stops. It&rsquo;s been a &hellip;">
+  <meta name="description" content="A client just asked me, how many lines of code is the project?
+Despite being an absurd question, and having no relation with the project at all this &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +64,83 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/11/your-code-statistics/">How Many Lines of Code Is Your Project?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-11T00:34:00+04:00" pubdate data-updated="true">Sep 11<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A client just asked me, how many lines of code is the project?
+Despite being an absurd question, and having no relation with the project at all this made me really curious to find out.
+After a quick web search, I stumbled upon this piece of code (Bare in find this is for a rails app).</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>find ./app -type f | xargs cat | wc -l</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What does this code do?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>find</span></code></pre></td></tr></table></div></figure>
+
+
+<p> is a shell method that searches through the files.
+The next part,</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./app -type f</span></code></pre></td></tr></table></div></figure>
+
+
+<p> searches the app directory. You can search any directory you want, this looks at the app directory which in a rails app holds majority of the code you write.
+After that you list the type you want. If you search without the type you get both directories and files. In this case we just want files, hence the &ldquo;f&rdquo;. This is an alias for &ldquo;file&rdquo;.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>| xargs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We need to use xargs over here which reads the STDIN stream data and coverts each line into space separated arguments to the command.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cat |</span></code></pre></td></tr></table></div></figure>
+
+
+<p>reads the output and pipes it out to the next step of commands</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wc -l</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&ldquo;wc&rdquo; is short for word count. This gives 3 results. The first being the number of new lines, the second being the number of words and last the number of characters. However we are interested in the lines, hence the command &ldquo;-l&rdquo;.
+This is a cool little script to get an overview of the size of the codebase.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -181,6 +259,10 @@ This is a brief overview of my journey over the past couple of years, read the w
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/09/11/your-code-statistics/">How Many Lines of Code Is Your Project?</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/08/24/advice-to-people-learning-how-to-code/">Advice to People Learning How to Code</a>

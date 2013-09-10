@@ -4,7 +4,7 @@
   <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-08-24T02:29:09+04:00</updated>
+  <updated>2013-09-11T03:08:54+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How many lines of code is your project?]]></title>
+    <link href="http://shivamd.github.io/blog/2013/09/11/your-code-statistics/"/>
+    <updated>2013-09-11T00:34:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/09/11/your-code-statistics</id>
+    <content type="html"><![CDATA[<p>A client just asked me, how many lines of code is the project?
+Despite being an absurd question, and having no relation with the project at all this made me really curious to find out.
+After a quick web search, I stumbled upon this piece of code (Bare in find this is for a rails app).</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>find ./app -type f | xargs cat | wc -l</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What does this code do?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>find</span></code></pre></td></tr></table></div></figure>
+
+
+<p> is a shell method that searches through the files.
+The next part,</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./app -type f</span></code></pre></td></tr></table></div></figure>
+
+
+<p> searches the app directory. You can search any directory you want, this looks at the app directory which in a rails app holds majority of the code you write.
+After that you list the type you want. If you search without the type you get both directories and files. In this case we just want files, hence the &ldquo;f&rdquo;. This is an alias for &ldquo;file&rdquo;.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>| xargs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We need to use xargs over here which reads the STDIN stream data and coverts each line into space separated arguments to the command.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cat |</span></code></pre></td></tr></table></div></figure>
+
+
+<p>reads the output and pipes it out to the next step of commands</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wc -l</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&ldquo;wc&rdquo; is short for word count. This gives 3 results. The first being the number of new lines, the second being the number of words and last the number of characters. However we are interested in the lines, hence the command &ldquo;-l&rdquo;.
+This is a cool little script to get an overview of the size of the codebase.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Advice to people learning how to code]]></title>
