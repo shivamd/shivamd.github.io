@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: git | Shivam Daryanani's Blog]]></title>
+  <link href="http://shivamd.github.io/blog/categories/git/atom.xml" rel="self"/>
+  <link href="http://shivamd.github.io/"/>
+  <updated>2013-11-02T01:11:32+04:00</updated>
+  <id>http://shivamd.github.io/</id>
+  <author>
+    <name><![CDATA[Shivam Daryanani]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Git Cheat Sheet]]></title>
+    <link href="http://shivamd.github.io/blog/2013/09/11/git-cheat-sheet/"/>
+    <updated>2013-09-11T13:01:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/09/11/git-cheat-sheet</id>
+    <content type="html"><![CDATA[<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git log -p file.rb</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+</feed>

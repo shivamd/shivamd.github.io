@@ -9,8 +9,7 @@
   <meta name="author" content="Shivam Daryanani">
 
   
-  <meta name="description" content="A client just asked me, how many lines of code is the project?
-Despite being an absurd question, and having no relation with the project at all this &hellip;">
+  <meta name="description" content="Been working on a side project with a friend and we were at the point where we needed to build an API for the code we had written. The idea was to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +63,286 @@ Despite being an absurd question, and having no relation with the project at all
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/">Creating a Secure and Versioned API in Rails</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-01T23:55:00+04:00" pubdate data-updated="true">Nov 1<span>st</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Been working on a side project with a friend and we were at the point where we needed to build an API for the code we had written. The idea was to build an API which can be accessed by our customers with an API key.</p>
+
+<p>After some research, I found couple  of gems that make it easy to do this. <a href="https://github.com/filtersquad/rocket_pants">Rocket Pants</a> and <a href="https://github.com/bploetz/versionist">Versionist</a>. In order to reduce the dependencies, I decided to build it myself with the help of <a href="https://railscasts.com">RailsCasts</a>.</p>
+
+<h3>Creating the API.</h3>
+
+<p>We will start off by creating the routes for it.</p>
+
+<figure class='code'><figcaption><span>config/routes.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">namespace</span> <span class="ss">:api</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">namespace</span> <span class="ss">:v1</span> <span class="k">do</span>
+</span><span class='line'>     <span class="n">namespace</span> <span class="ss">:search</span> <span class="k">do</span>
+</span><span class='line'>       <span class="n">get</span> <span class="s2">&quot;youtube&quot;</span>
+</span><span class='line'>     <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This block of code gives us the following route:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/api/v1/search/youtube</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now in order to create the controller, since they are namespaced under api and the version number you must put the controller inside the two modules.</p>
+
+<figure class='code'><figcaption><span>app/controllers/api/v1/search_controller.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Api</span>
+</span><span class='line'>  <span class="k">module</span> <span class="nn">V1</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">SearchController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">def</span> <span class="nf">youtube</span>
+</span><span class='line'>        <span class="c1">#code that searches for youtube videos</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now doing the following should give you a list of YouTube results in a JSON format.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl yoururl.com/api/v1/search/youtube?query<span class="o">=</span>funny
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This setup gives us the ability to easily add new versions of the API while maintaining backwards compatibility. The only thing is that the API is not secure.</p>
+
+<h3>Securing the API.</h3>
+
+<p>There are a few ways you can do this. Instead of doing it with OAuth I just created an access token given to each application created. The access token is created using a SecureRandom.hex string.</p>
+
+<figure class='code'><figcaption><span>app/models/user.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="c1">#code for authentication </span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:applications</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>app/models/application.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Application</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">before_create</span> <span class="ss">:generate_access_token</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:user</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">generate_access_token</span>
+</span><span class='line'>    <span class="k">begin</span>
+</span><span class='line'>      <span class="nb">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="no">SecureRandom</span><span class="o">.</span><span class="n">hex</span>
+</span><span class='line'>    <span class="k">end</span> <span class="k">while</span> <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="n">access_token</span><span class="p">:</span> <span class="n">access_token</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The way I set this up is that a user can have many applications, and each application belongs to a user. Before an application is created there is a unique key which is generated restricing access to the API.
+There are other columns you can add to the model if needed such as permissions, expires_at etc.</p>
+
+<figure class='code'><figcaption><span>app/controllers/api/v1/search_controller.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Api</span>
+</span><span class='line'>  <span class="k">module</span> <span class="nn">V1</span>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">SearchController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>      <span class="n">before_filter</span> <span class="ss">:restrict_access</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">def</span> <span class="nf">youtube</span>
+</span><span class='line'>        <span class="c1">#code that searches for youtube videos</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">def</span> <span class="nf">restrict_access</span>
+</span><span class='line'>        <span class="n">app</span> <span class="o">=</span> <span class="no">Application</span><span class="o">.</span><span class="n">find_by_access_token</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:access_token</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">head</span> <span class="ss">:unauthorized</span> <span class="k">unless</span> <span class="n">app</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Updating the controller in order to send an unauthorized response if the access key is invalid. Now in order to make a request the user has to send in the right access_token in the parameters. Also make sure to not make the access_token field accessible using attr_accessible or in rails 4 you can do the following:</p>
+
+<figure class='code'><figcaption><span>app/controllers/applications.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">ApplicationsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>  <span class="c1">#code for controller</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">create</span>
+</span><span class='line'>    <span class="vi">@application</span> <span class="o">=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">application_params</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1">#code to save application</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">application_params</span>
+</span><span class='line'>    <span class="n">params</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="ss">:application</span><span class="p">)</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Instead of directly passing in the params[:application] we pass the build method a method itself. This private method makes sure to only permit the application name.</p>
+
+<p>Since the output of my controllers were already in JSON there was no need for <a href="https://github.com/nesquena/rabl">RABL</a>. Also for those looking for something lightweight can have a look at <a href="https://github.com/rails-api/rails-api">Rails-API</a>. This is enough to get you started if you any questions leave comments and I shall address them.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/11/git-cheat-sheet/">Git Cheat Sheet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-11T13:01:00+04:00" pubdate data-updated="true">Sep 11<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git log -p file.rb</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -259,6 +538,14 @@ This is a brief overview of my journey over the past couple of years, read the w
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/">Creating a Secure and Versioned API in Rails</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/11/git-cheat-sheet/">Git Cheat Sheet</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/09/11/your-code-statistics/">How Many Lines of Code Is Your Project?</a>

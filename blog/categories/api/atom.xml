@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: code | Shivam Daryanani's Blog]]></title>
-  <link href="http://shivamd.github.io/blog/categories/code/atom.xml" rel="self"/>
+  <title><![CDATA[Category: api | Shivam Daryanani's Blog]]></title>
+  <link href="http://shivamd.github.io/blog/categories/api/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
   <updated>2013-11-02T01:11:32+04:00</updated>
   <id>http://shivamd.github.io/</id>
@@ -267,79 +267,6 @@ There are other columns you can add to the model if needed such as permissions, 
 <p>Instead of directly passing in the params[:application] we pass the build method a method itself. This private method makes sure to only permit the application name.</p>
 
 <p>Since the output of my controllers were already in JSON there was no need for <a href="https://github.com/nesquena/rabl">RABL</a>. Also for those looking for something lightweight can have a look at <a href="https://github.com/rails-api/rails-api">Rails-API</a>. This is enough to get you started if you any questions leave comments and I shall address them.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Git Cheat Sheet]]></title>
-    <link href="http://shivamd.github.io/blog/2013/09/11/git-cheat-sheet/"/>
-    <updated>2013-09-11T13:01:00+04:00</updated>
-    <id>http://shivamd.github.io/blog/2013/09/11/git-cheat-sheet</id>
-    <content type="html"><![CDATA[<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>git log -p file.rb</span></code></pre></td></tr></table></div></figure></notextile></div></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How many lines of code is your project?]]></title>
-    <link href="http://shivamd.github.io/blog/2013/09/11/your-code-statistics/"/>
-    <updated>2013-09-11T00:34:00+04:00</updated>
-    <id>http://shivamd.github.io/blog/2013/09/11/your-code-statistics</id>
-    <content type="html"><![CDATA[<p>A client just asked me, how many lines of code is the project?
-Despite being an absurd question, and having no relation with the project at all this made me really curious to find out.
-After a quick web search, I stumbled upon this piece of code (Bare in find this is for a rails app).
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>find ./app -type f | xargs cat | wc -l</span></code></pre></td></tr></table></div></figure></notextile></div>
-What does this code do?
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>find</span></code></pre></td></tr></table></div></figure></notextile></div> is a shell method that searches through the files.
-The next part, <div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./app -type f</span></code></pre></td></tr></table></div></figure></notextile></div> searches the app directory. You can search any directory you want, this looks at the app directory which in a rails app holds majority of the code you write.
-After that you list the type you want. If you search without the type you get both directories and files. In this case we just want files, hence the &ldquo;f&rdquo;. This is an alias for &ldquo;file&rdquo;.
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>| xargs</span></code></pre></td></tr></table></div></figure></notextile></div>
-We need to use xargs over here which reads the STDIN stream data and coverts each line into space separated arguments to the command.
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cat |</span></code></pre></td></tr></table></div></figure></notextile></div>
-reads the output and pipes it out to the next step of commands
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>wc -l</span></code></pre></td></tr></table></div></figure></notextile></div>
-&ldquo;wc&rdquo; is short for word count. This gives 3 results. The first being the number of new lines, the second being the number of words and last the number of characters. However we are interested in the lines, hence the command &ldquo;-l&rdquo;.
-This is a cool little script to get an overview of the size of the codebase.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Advice to people learning how to code]]></title>
-    <link href="http://shivamd.github.io/blog/2013/08/24/advice-to-people-learning-how-to-code/"/>
-    <updated>2013-08-24T01:37:00+04:00</updated>
-    <id>http://shivamd.github.io/blog/2013/08/24/advice-to-people-learning-how-to-code</id>
-    <content type="html"><![CDATA[<p>There is a lot of advice thrown out there to people who are just starting out to learn how to program. The learning never stops. It&rsquo;s been a crazy journey over the past two years, from spending countless hours alone trying to learn things by myself. To enrolling into a <a href="http://bloc.io">Bloc</a> course and then finally the intensive 12 weeks of <a href="http://devbootcamp.com">Dev Bootcamp</a>. Now I am a contract web developer who is tackling challenging problems, learning new things on a daily basis and loving every moment of it.</p>
-
-<p>So what is my piece of advice? Build things. There is no secret formula, book or programming language. The only way to improve is to build things. I don&rsquo;t care what programming language you use (<a href="http://www.ruby-lang.org/en/">Ruby</a> is awesome), just build things. Half baked things, things people would use or things you want to use. Basically anything!</p>
-
-<p>I&rsquo;ll be honest with you. I wasted the starting months while learning. I kept devouring new books, latest challenges of <a href="http://codecademy.com">codecademy</a> and anything that kept me away from uncertainty. This just filled my ego. I wasn&rsquo;t progressing as a programmer, I was just getting comfortable with syntax. I was lying to myself that I was improving. The bottom line is, the only way to improve is to build things.</p>
-
-<h3>I have a lot of time but I don&rsquo;t know what to build.</h3>
-
-<p>Stop feeding yourself excuses. You use a lot of websites on a daily basis. How about build a clone of it? Try exercising different muscles.
-Want some ideas?</p>
-
-<ul>
-<li>  <a href="http://www.dreamincode.net/forums/topic/78802-martyr2s-mega-project-ideas-list/">Martyr2&rsquo;S Mega Project Ideas List</a></li>
-<li>  <a href="http://jenniferdewalt.com/">180 websites in 180 days</a></li>
-</ul>
-
-
-<p>Your task over here is not to make money with these things, I am not saying you can&rsquo;t, but your main focus should be to get as much experience under your belt as possible.</p>
-
-<h3>I don&rsquo;t have enough time.</h3>
-
-<p>Lies. If this really matters to you, you will find time. Skip an episode of your favorite TV show, don&rsquo;t go out for that movie or cancel a night out. Carve out a set time couple of times a week, more if you can. And just code. Think of it as an appointment that you can&rsquo;t miss, nothing else matters during those hours.</p>
-
-<p>You are not doing this to get a job or to make your <a href="http://github.com">github</a> look impressive. It can, but your main objective here is to get better at coding. The idea here is to level up, tackle areas you are unfamiliar about and embrace the uncertainty. It&rsquo;s very easy to keep building things that don&rsquo;t stretch your skill level.</p>
-
-<p>Go code. Don&rsquo;t think about writing code, just code.</p>
 ]]></content>
   </entry>
   
