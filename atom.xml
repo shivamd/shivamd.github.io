@@ -4,7 +4,7 @@
   <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-02T01:11:32+04:00</updated>
+  <updated>2013-11-02T01:14:31+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -221,21 +221,6 @@ There are other columns you can add to the model if needed such as permissions, 
 <p>Instead of directly passing in the params[:application] we pass the build method a method itself. This private method makes sure to only permit the application name.</p>
 
 <p>Since the output of my controllers were already in JSON there was no need for <a href="https://github.com/nesquena/rabl">RABL</a>. Also for those looking for something lightweight can have a look at <a href="https://github.com/rails-api/rails-api">Rails-API</a>. This is enough to get you started if you any questions leave comments and I shall address them.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Git Cheat Sheet]]></title>
-    <link href="http://shivamd.github.io/blog/2013/09/11/git-cheat-sheet/"/>
-    <updated>2013-09-11T13:01:00+04:00</updated>
-    <id>http://shivamd.github.io/blog/2013/09/11/git-cheat-sheet</id>
-    <content type="html"><![CDATA[
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>git log -p file.rb</span></code></pre></td></tr></table></div></figure>
-
-
-
 ]]></content>
   </entry>
   
