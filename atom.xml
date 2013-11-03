@@ -4,7 +4,7 @@
   <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-03T09:14:24+04:00</updated>
+  <updated>2013-11-04T00:37:53+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,228 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Nested Attributes in Rails 4]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/03/nested-attributes-in-rails-4/"/>
+    <updated>2013-11-03T23:24:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/03/nested-attributes-in-rails-4</id>
+    <content type="html"><![CDATA[<p>Often when creating a web application there comes a time where two models are related and you want to create one form where you can add both the attributes. Let&rsquo;s say you have a topic model which has many questions, and you want to create the topic and questions for it in one form. Rails makes this easy with the accepts_nested_attributes_for method.</p>
+
+<h3>Models</h3>
+
+<figure class='code'><figcaption><span>app/models/topic.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Topic</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:questions</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>app/models/question.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Question</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:topic</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In order for the topic form to be able to add questions, we need the following line:</p>
+
+<figure class='code'><figcaption><span>app/models/topic.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Topic</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:questions</span>
+</span><span class='line'>  <span class="n">accepts_nested_attributes_for</span> <span class="ss">:questions</span><span class="p">,</span> <span class="n">allow_destroy</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Accepts nested attributes is just a shortcut, it defines a dynamic attribute {field_name}_attributes so you can automatically assign them to an association. The allow destroy lets you destroy question objects in this case through the form, it is set to false from the start. There are other methods you can use with this, such as reject_if, limit and  update_only. More information can be found from the <a href="http://apidock.com/rails/ActiveRecord/NestedAttributes/ClassMethods/accepts_nested_attributes_for">source</a>.</p>
+
+<h3>Form</h3>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="sx">%= form_for @topic do |f| %&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sx">  &lt;div id=</span><span class="s2">&quot;name&quot;</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;field&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;</span><span class="sx">%= f.text_field :name, placeholder: &quot;Name&quot; %&gt;</span>
+</span><span class='line'><span class="sx">  &lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sx">  &lt;div id=</span><span class="s2">&quot;questions&quot;</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;field&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;</span><span class="sx">%= f.fields_for :questions do |builder| %&gt;</span>
+</span><span class='line'><span class="sx">      &lt;div class=</span><span class="s2">&quot;question&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="sx">%= builder.text_field :content, placeholder: &quot;Question&quot; %&gt;</span>
+</span><span class='line'><span class="sx">      &lt;/div&gt;</span>
+</span><span class='line'><span class="sx">    &lt;% end %&gt;</span>
+</span><span class='line'><span class="sx">  &lt;/div&gt;</span>
+</span><span class='line'><span class="sx">  </span>
+</span><span class='line'><span class="sx">  &lt;%=</span> <span class="n">f</span><span class="o">.</span><span class="n">submit</span> <span class="s2">&quot;Create topic&quot;</span> <span class="sx">%&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sx">&lt;% end %&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This creates a simple form which allows you to create a topic with a name and add one question to it.</p>
+
+<h3>Controller &amp; Routes</h3>
+
+<p>The controller method for create is your regular create method, nothing fancy. That&rsquo;s why I love Rails.</p>
+
+<figure class='code'><figcaption><span>app/controllers/topics_controller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">TopicsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">new</span>
+</span><span class='line'>    <span class="vi">@topic</span> <span class="o">=</span> <span class="no">Topic</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="vi">@question</span> <span class="o">=</span> <span class="vi">@topic</span><span class="o">.</span><span class="n">questions</span><span class="o">.</span><span class="n">build</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">create</span>
+</span><span class='line'>    <span class="vi">@topic</span> <span class="o">=</span> <span class="no">Topic</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">topic_params</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="vi">@topic</span><span class="o">.</span><span class="n">save</span>
+</span><span class='line'>      <span class="n">render</span> <span class="ss">:new</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="n">redirect_to</span> <span class="n">root_path</span><span class="p">,</span> <span class="ss">notice</span><span class="p">:</span> <span class="s2">&quot;Successfully created a topic&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">topic_params</span>
+</span><span class='line'>    <span class="n">params</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="ss">:topic</span><span class="p">)</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="n">questions_attributes</span><span class="p">:</span> <span class="o">[</span><span class="ss">:content</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The new method creates the instances for both topic and questions. In the create action we instantiate a topic passing in a method. This is a private method needed in Rails 4 to make sure only the allowed attributes are used. We require the topic parameters and permit the name for a topic and the questions_attributes. Now all we need are the routes and this will work.</p>
+
+<figure class='code'><figcaption><span>config/routes.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">resources</span> <span class="ss">:topics</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we have a simple version of adding questions to a topic, but we still don&rsquo;t have validations.</p>
+
+<h3>Validations</h3>
+
+<p>It is good practice to have your validations on both the database level and on the Rails model&rsquo;s itself. The validation for the association is not as straightforward as it seems.  A common approach would look like this.</p>
+
+<figure class='code'><figcaption><span>app/models/topic.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Topic</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:questions</span>
+</span><span class='line'>  <span class="n">accepts_nested_attributes_for</span> <span class="ss">:questions</span><span class="p">,</span> <span class="n">allow_destroy</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">validates</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">presence</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>app/models/question.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Question</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:topic</span>
+</span><span class='line'>  <span class="n">validates</span> <span class="ss">:content</span><span class="p">,</span> <span class="ss">:topic_id</span><span class="p">,</span>  <span class="ss">presence</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These are simple validations that would normally pass but they won&rsquo;t because of the nested forms. You need to tell Rails that the two model relations describe the same relationship but from the opposite direction. Rails provides a method for this, inverse_of. Rails has a method for everything.</p>
+
+<figure class='code'><figcaption><span>app/models/topic.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Topic</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:questions</span><span class="p">,</span> <span class="n">inverse_of</span> <span class="ss">:topic</span>
+</span><span class='line'>  <span class="n">accepts_nested_attributes_for</span> <span class="ss">:questions</span><span class="p">,</span> <span class="n">allow_destroy</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">validates</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">presence</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>app/models/question.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Question</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:topic</span><span class="p">,</span> <span class="n">inverse_of</span> <span class="ss">:questions</span>
+</span><span class='line'>  <span class="n">validates</span> <span class="ss">:content</span><span class="p">,</span> <span class="ss">:topic</span><span class="p">,</span>  <span class="ss">presence</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see we indicated the inverse of relation from both sides. Also now the Question model validates the topic itself instead of the ID.</p>
+
+<p>There you have it, a form that accepts nested attributes in Rails 4 with validations.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Facebook Realtime Updates in a Rails Application]]></title>
