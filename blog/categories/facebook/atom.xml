@@ -4,7 +4,7 @@
   <title><![CDATA[Category: facebook | Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/blog/categories/facebook/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-03T09:13:16+04:00</updated>
+  <updated>2013-11-03T09:14:24+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Facebook Realtime Updates]]></title>
+    <title type="html"><![CDATA[Facebook Realtime Updates in a Rails Application]]></title>
     <link href="http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates/"/>
     <updated>2013-11-03T00:01:00+04:00</updated>
     <id>http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates</id>
