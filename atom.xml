@@ -4,7 +4,7 @@
   <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-02T01:18:03+04:00</updated>
+  <updated>2013-11-03T09:13:16+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,268 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Facebook Realtime Updates]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates/"/>
+    <updated>2013-11-03T00:01:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates</id>
+    <content type="html"><![CDATA[<p>Since Facebook has rolled out realtime updates it has been easier to gather information. Instead of hitting the API on a set time interval, we can just wait for Facebook to ping us and go grab the information we need. This all sounds good in theory but as I had to integrate realtime updates for an application I am working on, there were quite a few pitfalls and I wish I knew some of these before hand.</p>
+
+<h3>Setting up a Facebook application</h3>
+
+<p>I am not going to walk you through creating a Facebook application, <a href="http://railscasts.com/episodes/360-facebook-authentication?view=asciicast">Ryan Bates</a> already does a good job with it. Once you have that setup and the permissions you need for this application head over to your <a href="https://developers.facebook.com/apps">Facebook applications</a> dashboard. Over here select the application in which you would like to enable realtime updates and hit the edit button on the top right. This should take you to a page with the basic information of your application, and on the right under settings there should be &lsquo;realtime updates&rsquo;.</p>
+
+<p><img class="center" src="http://shivamd.github.io/images/realtime_settings.png"></p>
+
+<p>As you can see I have a user object and the fields I want to follow. I have selected all the fields for the demo. You should only select the fields your app has permissions for, otherwise it would be pointless as you won&rsquo;t be able to get the information.
+For the callback URL you should point it to the route of the realtime action, but you must be thinking how will I test this locally? That&rsquo;s where <a href="https://ngrok.com/">Ngrok</a> comes in. Ngrok creates a tunnel from the public internet to a port on your local machine. This is perfect for a situation like this where Facebook has to verify that you are authorized.
+The information on the site is self explanatory, once installed have it listen to the same port as your server.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>rails s -p 3000
+</span><span class='line'><span class="c"># on a different Terminal window</span>
+</span><span class='line'>path/to/ngrok 3000
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ngrok will give you a URL which you can paste in to the callback section followed by the route to the realtime action. For the verify token any random string will do.</p>
+
+<h3>Setting up the controller</h3>
+
+<p>Now create a facebook controller with the real_time method.</p>
+
+<figure class='code'><figcaption><span>app/controllers/facebook_controller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>   <span class="k">def</span> <span class="nf">real_time</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;hub.mode&#39;</span><span class="o">]</span> <span class="o">==</span><span class="s1">&#39;subscribe&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;hub.verify_token&#39;</span><span class="o">]</span> <span class="o">==</span><span class="s1">&#39;stringToken&#39;</span>
+</span><span class='line'>        <span class="n">render</span> <span class="ss">:text</span> <span class="o">=&gt;</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;hub.challenge&#39;</span><span class="o">]</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="n">render</span> <span class="ss">:text</span> <span class="o">=&gt;</span> <span class="s1">&#39;Failed to authorize facebook challenge request&#39;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">elsif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span>
+</span><span class='line'>      <span class="c1">#do stuff with information </span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the routes should look like this:</p>
+
+<figure class='code'><figcaption><span>config/routes.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>    <span class="n">namespace</span> <span class="ss">:facebook</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">match</span> <span class="s2">&quot;/real_time&quot;</span><span class="p">,</span> <span class="ss">:action</span> <span class="o">=&gt;</span> <span class="ss">:real_time</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="s1">&#39;facebook_subscription&#39;</span><span class="p">,</span> <span class="ss">:via</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="ss">:get</span><span class="p">,</span><span class="ss">:post</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we have the route set up for both GET&amp;POST, when we click on test on the realtime updates page Facebook will make a get request to this route ensuring we are authorized. The default hub.mode set by Facebook is subscribe and you must make sure that the verify_token matches what you have entered on Facebook. If all went well Facebook will prompt you with the following message:</p>
+
+<p><img class="center" src="http://shivamd.github.io/images/realtime_success.png"></p>
+
+<h3>And we are done&hellip;not really.</h3>
+
+<p>Your application is running, realtime updates are setup and you have a test account to play around with. On every change the user makes to the field you have subscribed to, Facebook will ping your servers. However it will only do so with the Facebook ID, the fields that have changed and a timestamp. This means that we still have to query the API and this can be quite a pain when it comes to things like comments or photos. The good thing is I have banged my head on this for the past week and should be able to alleviate a lot of your troubles.</p>
+
+<p>Facebook example response for relationship change:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;relationship_status&quot;</span><span class="p">,</span> <span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">,</span> <span class="s2">&quot;facebook&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;relationship_status&quot;</span><span class="p">,</span> <span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">}}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now in order to actually grab the change we have to make a call to the Facebook API requesting this information. You will only be able to get this information if you have the right permissions.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="c1">#you&#39;ll need the HTTParty gem</span>
+</span><span class='line'>  <span class="no">HTTParty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://graph.facebook.com/</span><span class="si">#{</span><span class="n">uid</span><span class="si">}</span><span class="s2">?fields=relationship_status&amp;access_token=&quot;</span> <span class="o">+</span> <span class="n">auth_token</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This gives the information for the relationship status. This seems and is straight forward and these are the building pieces for every change. However there are some caveats. Below are snippets in order to get events,friends,posts,photos&amp;comments.</p>
+
+<h3>Events</h3>
+
+<p>Facebook example response for events change:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">,</span> <span class="s2">&quot;facebook&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">}}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the query to get all event ID&rsquo;s and the respective information:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="c1">#where token is the user&#39;s auth token</span>
+</span><span class='line'>  <span class="n">event_ids</span> <span class="o">=</span> <span class="ss">FbGraph</span><span class="p">:</span><span class="ss">:Query</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;SELECT eid, rsvp_status FROM event_member WHERE uid = </span><span class="si">#{</span><span class="n">uid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">access_token</span><span class="p">:</span> <span class="n">token</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">event_ids</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">event_id</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">event_info</span> <span class="o">=</span> <span class="ss">FbGraph</span><span class="p">:</span><span class="ss">:Query</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;SELECT creator, eid, all_members_count, attending_count, not_replied_count, declined_count, unsure_count, privacy, host, location, name, description, venue, pic, start_time, end_time FROM event WHERE eid=</span><span class="si">#{</span><span class="n">event_id</span><span class="o">[</span><span class="s1">&#39;eid&#39;</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">access_token</span><span class="p">:</span> <span class="n">token</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Friends</h3>
+
+<p>Facebook example response for friends change:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;friends&quot;</span><span class="p">,</span> <span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">,</span> <span class="s2">&quot;facebook&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;friends&quot;</span><span class="p">,</span> <span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">}}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the query to get all friend&rsquo;s related information:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#token is the user&#39;s auth token</span>
+</span><span class='line'><span class="n">friends</span> <span class="o">=</span> <span class="no">HTTParty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://graph.facebook.com/&quot;</span> <span class="o">+</span> <span class="n">uid</span> <span class="o">+</span> <span class="s2">&quot;/friends?access_token=&quot;</span> <span class="o">+</span> <span class="n">token</span> <span class="o">+</span> <span class="s2">&quot;&amp;fields=birthday,age_range,gender,first_name,last_name,name,id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parsed_response</span><span class="o">[</span><span class="s2">&quot;data&quot;</span><span class="o">]</span>
+</span><span class='line'><span class="n">friends</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">friend</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">friend_data</span> <span class="o">=</span> <span class="no">HTTParty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://graph.facebook.com/&quot;</span> <span class="o">+</span> <span class="n">friend</span><span class="o">[</span><span class="s2">&quot;id&quot;</span><span class="o">]</span> <span class="o">+</span> <span class="s2">&quot;?access_token=&quot;</span> <span class="o">+</span> <span class="n">token</span> <span class="o">+</span> <span class="s2">&quot;&amp;fields=about,age_range,birthday,link,bio,events,gender,interested_in,location,name,relationship_status,significant_other,first_name,interested_in,last_name,locale,location,username,family,likes,locations,movies,picture,photos,posts,security_settings&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parsed_response</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Posts,Photos&amp;Comments</h3>
+
+<p>Now this is where things start to get complicated. As you can see Facebook sends &lsquo;feed&rsquo; as a changed field with every column.With every change to anything on Facebook it needs to update the feed and in order to get the photos,posts and comments we must query the feed or stream in the Facebook Query Language. Despite being able to get posts on the &lsquo;status&rsquo; changed field and photos on the &lsquo;photos&rsquo; changed field, I found it best to look for the feed change and make a query.</p>
+
+<p>One great thing with the Facebook Query Language is that you can add conditions to your queries.When making a query after a realtime update, you can put a conditional for updated time to be just before the timestamp given by Facebook.That&rsquo;s what I thought too, but after a lot of digging Facebook doesn&rsquo;t give you the right information. The only way around this is to get all the posts, sort them by updated time and then use ruby&rsquo;s built in methods to select the posts before a certain time.</p>
+
+<p>Facebook example response for feed:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#as you can see it gives us the time</span>
+</span><span class='line'><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">,</span> <span class="s2">&quot;facebook&quot;</span><span class="o">=&gt;</span><span class="p">{</span><span class="s2">&quot;object&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;entry&quot;</span><span class="o">=&gt;[</span><span class="p">{</span><span class="s2">&quot;uid&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="o">=&gt;</span><span class="s2">&quot;100928374283421&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="o">=&gt;</span><span class="mi">1383426584</span><span class="p">,</span> <span class="s2">&quot;changed_fields&quot;</span><span class="o">=&gt;[</span><span class="s2">&quot;feed&quot;</span><span class="o">]</span><span class="p">}</span><span class="o">]</span><span class="p">}}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the query to get the latest posts:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>
+</span><span class='line'><span class="n">latest_posts</span> <span class="o">=</span> <span class="ss">FbGraph</span><span class="p">:</span><span class="ss">:Query</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;SELECT comment_info,post_id,message,actor_id,attachment,is_hidden,like_info,message_tags,permalink,privacy,created_time,updated_time,share_count,target_id,type,with_tags from stream WHERE source_id=me() and (message or attachment) ORDER BY updated_time DESC LIMIT 100&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">access_token</span><span class="ss">:token</span><span class="p">)</span>
+</span><span class='line'><span class="n">posts</span> <span class="o">=</span> <span class="n">latest_posts</span><span class="o">.</span><span class="n">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span> <span class="n">post</span><span class="o">[</span><span class="s2">&quot;updated_time&quot;</span><span class="o">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">time</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">select</span><span class="p">{</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span> <span class="n">post</span><span class="o">[</span><span class="s2">&quot;message&quot;</span><span class="o">].</span><span class="n">present?</span> <span class="o">||</span> <span class="n">post</span><span class="o">[</span><span class="s2">&quot;attachment&quot;</span><span class="o">][</span><span class="s2">&quot;media&quot;</span><span class="o">]</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What&rsquo;s going on here? In the first query, I find all the posts of the user limit them to 100, order them by updated time and make sure that either message or attachment(photo) is present. In the next line I take only the posts that have an updated time 30 seconds(approximate time it takes Facebook to ping your servers) before the timestamp. And select the ones that either have a message or photos. Now we have a bunch of posts, time to decipher whether it is a status update, photo or comment.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#posts from the previous codeblock </span>
+</span><span class='line'><span class="n">posts</span><span class="o">.</span><span class="n">each</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">post</span><span class="o">[</span><span class="s2">&quot;message&quot;</span><span class="o">].</span><span class="n">present?</span>
+</span><span class='line'>    <span class="c1">#create post</span>
+</span><span class='line'>  <span class="k">elsif</span> <span class="n">post</span><span class="o">[</span><span class="s2">&quot;attachment&quot;</span><span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="n">post</span><span class="o">[</span><span class="s2">&quot;attachment&quot;</span><span class="o">][</span><span class="s2">&quot;media&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="c1">#create photo with post[&quot;attachment&quot;][&quot;media&quot;] passed as a parameter</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The post is fairly simple from here, we already have the attributes we need. Now in order to get comments for post, we can do the following query:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#you can sort by time if needed </span>
+</span><span class='line'><span class="n">comments</span> <span class="o">=</span> <span class="ss">FbGraph</span><span class="p">:</span><span class="ss">:Query</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;SELECT id, user_likes, text, post_id, fromid, likes, time FROM comment WHERE post_id = &#39;</span><span class="si">#{</span><span class="n">post_id</span><span class="si">}</span><span class="s2">&#39; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">access_token</span><span class="ss">:token</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The use case for me is to update all the comments for the posts and add the new ones, hence I query for all of them. Facebook gives you the flexibility with the query language for any use case possible. Posts,and comments done and now time for photos.
+After rigourous testing, Facebook gives only 9 photos. Let&rsquo;s say a user added an album, added 50 photos to this with normal queries that I am about to display Facebook will only give 9 photos back. The worst part is there&rsquo;s no way to decipher if there are more photos. One trick I found is, if Facebook gives you 9 photos that means there are more photos. Hence I find all the photos in the album.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#for each post from the previous block that has attachments</span>
+</span><span class='line'><span class="n">photo_ids</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">i</span><span class="o">[</span><span class="s2">&quot;photo&quot;</span><span class="o">][</span><span class="s2">&quot;fbid&quot;</span><span class="o">]</span> <span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="n">photo_ids</span><span class="o">.</span><span class="n">count</span> <span class="o">==</span> <span class="mi">9</span>
+</span><span class='line'>  <span class="c1"># get data for first photo</span>
+</span><span class='line'>  <span class="nb">id</span> <span class="o">=</span> <span class="n">photo_ids</span><span class="o">.</span><span class="n">first</span>
+</span><span class='line'>  <span class="n">photo_data</span> <span class="o">=</span> <span class="no">HTTParty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://graph.facebook.com/</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2">?access_token=</span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">auth_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1">#parse album ID and get all photo id&#39;s for that album</span>
+</span><span class='line'>  <span class="n">album_id</span> <span class="o">=</span> <span class="n">photo_data</span><span class="o">[</span><span class="s2">&quot;link&quot;</span><span class="o">].</span><span class="n">match</span><span class="p">(</span><span class="sr">/(a\.)([^\.]+)/</span><span class="p">)</span><span class="o">[-</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">response</span> <span class="o">=</span> <span class="no">HTTParty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://graph.facebook.com/</span><span class="si">#{</span><span class="n">album_id</span><span class="si">}</span><span class="s2">/photos?fields=id&amp;access_token=</span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">auth_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">photo_ids</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">parsed_response</span><span class="o">[</span><span class="s2">&quot;data&quot;</span><span class="o">].</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">i</span><span class="o">[</span><span class="s2">&quot;id&quot;</span><span class="o">]</span> <span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I get the photo_ids from the first line, and if there are 9 which means more photos I get all photo IDs from the album.
+Iterating over all the photo ID&rsquo;s to get the related informaton:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">photo_ids</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">id</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">photo_data</span> <span class="o">=</span> <span class="no">HTTParty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://graph.facebook.com/</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2">?access_token=</span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">auth_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1">#and for comments </span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">photo_data</span><span class="o">.</span><span class="n">has_key?</span><span class="p">(</span><span class="s2">&quot;comments&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">photo_data</span><span class="o">[</span><span class="s2">&quot;comments&quot;</span><span class="o">][</span><span class="s2">&quot;data&quot;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">comment</span><span class="o">|</span>
+</span><span class='line'>      <span class="c1">#use comment information</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see there&rsquo;s a lot of edge cases here, so you must test thoroughly. Both manually and with automated tests. One good thing about the photo query is that it gives you comment information too. The following takes care of status updates, comments on them, photos posted on the wall, comments to those and if the user posts an album. The only part I haven&rsquo;t been able to get is realtime comment on a photo which is inside an album. I am currently working on that, and will update this post if I find a way.</p>
+
+<h3>Wrapping it all up.</h3>
+
+<p>Despite it&rsquo;s limitations Facebook has done a great job with the realtime updates and <a href="https://developers.facebook.com/docs/reference/fql/">Facebook Query Language</a>. I can&rsquo;t stress this point enough, test thoroughly. Manually and with automated testing such as Rspec. I have written tests for this and might showcase it in a later blog post. Whenever you get stuck, instead of searching StackOverflow which at times can help, the best approach I found is to use the <a href="https://developers.facebook.com/tools/explorer">Graph Explorer</a>.</p>
+
+<p>Hope that was useful, let me know if you have any questions.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating a Secure and Versioned API in Rails]]></title>

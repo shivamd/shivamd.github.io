@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Shivam Daryanani's Blog</title>
+  <title>Facebook Realtime Updates - Shivam Daryanani's Blog</title>
   <meta name="author" content="Shivam Daryanani">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://shivamd.github.io">
+  <link rel="canonical" href="http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Shivam Daryanani's Blog" type="application/atom+xml">
@@ -61,15 +61,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/11/03/facebook-realtime-updates/">Facebook Realtime Updates</a></h1>
+      <h1 class="entry-title">Facebook Realtime Updates</h1>
     
     
       <p class="meta">
@@ -92,7 +89,7 @@
   </header>
 
 
-  <div class="entry-content"><p>Since Facebook has rolled out realtime updates it has been easier to gather information. Instead of hitting the API on a set time interval, we can just wait for Facebook to ping us and go grab the information we need. This all sounds good in theory but as I had to integrate realtime updates for an application I am working on, there were quite a few pitfalls and I wish I knew some of these before hand.</p>
+<div class="entry-content"><p>Since Facebook has rolled out realtime updates it has been easier to gather information. Instead of hitting the API on a set time interval, we can just wait for Facebook to ping us and go grab the information we need. This all sounds good in theory but as I had to integrate realtime updates for an application I am working on, there were quite a few pitfalls and I wish I knew some of these before hand.</p>
 
 <h3>Setting up a Facebook application</h3>
 
@@ -347,260 +344,16 @@ Iterating over all the photo ID&rsquo;s to get the related informaton:</p>
 
 <p>Hope that was useful, let me know if you have any questions.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/">Creating a Secure and Versioned API in Rails</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Shivam Daryanani</span></span>
 
-<time datetime="2013-11-01T23:55:00+04:00" pubdate data-updated="true">Nov 1<span>st</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Been working on a side project with a friend and we were at the point where we needed to build an API for the code we had written. The idea was to build an API which can be accessed by our customers with an API key.</p>
-
-<p>After some research, I found couple  of gems that make it easy to do this. <a href="https://github.com/filtersquad/rocket_pants">Rocket Pants</a> and <a href="https://github.com/bploetz/versionist">Versionist</a>. In order to reduce the dependencies, I decided to build it myself with the help of <a href="https://railscasts.com">RailsCasts</a>.</p>
-
-<h3>Creating the API.</h3>
-
-<p>We will start off by creating the routes for it.</p>
-
-<figure class='code'><figcaption><span>config/routes.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">namespace</span> <span class="ss">:api</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">namespace</span> <span class="ss">:v1</span> <span class="k">do</span>
-</span><span class='line'>     <span class="n">namespace</span> <span class="ss">:search</span> <span class="k">do</span>
-</span><span class='line'>       <span class="n">get</span> <span class="s2">&quot;youtube&quot;</span>
-</span><span class='line'>     <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This block of code gives us the following route:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/api/v1/search/youtube</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now in order to create the controller, since they are namespaced under api and the version number you must put the controller inside the two modules.</p>
-
-<figure class='code'><figcaption><span>app/controllers/api/v1/search_controller.rb</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Api</span>
-</span><span class='line'>  <span class="k">module</span> <span class="nn">V1</span>
-</span><span class='line'>    <span class="k">class</span> <span class="nc">SearchController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">def</span> <span class="nf">youtube</span>
-</span><span class='line'>        <span class="c1">#code that searches for youtube videos</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now doing the following should give you a list of YouTube results in a JSON format.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl yoururl.com/api/v1/search/youtube?query<span class="o">=</span>funny
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This setup gives us the ability to easily add new versions of the API while maintaining backwards compatibility. The only thing is that the API is not secure.</p>
-
-<h3>Securing the API.</h3>
-
-<p>There are a few ways you can do this. Instead of doing it with OAuth I just created an access token given to each application created. The access token is created using a SecureRandom.hex string.</p>
-
-<figure class='code'><figcaption><span>app/models/user.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class='line'>  <span class="c1">#code for authentication </span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">has_many</span> <span class="ss">:applications</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>app/models/application.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Application</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class='line'>  <span class="n">before_create</span> <span class="ss">:generate_access_token</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">belongs_to</span> <span class="ss">:user</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">generate_access_token</span>
-</span><span class='line'>    <span class="k">begin</span>
-</span><span class='line'>      <span class="nb">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="no">SecureRandom</span><span class="o">.</span><span class="n">hex</span>
-</span><span class='line'>    <span class="k">end</span> <span class="k">while</span> <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="n">access_token</span><span class="p">:</span> <span class="n">access_token</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The way I set this up is that a user can have many applications, and each application belongs to a user. Before an application is created there is a unique key which is generated restricing access to the API.
-There are other columns you can add to the model if needed such as permissions, expires_at etc.</p>
-
-<figure class='code'><figcaption><span>app/controllers/api/v1/search_controller.rb</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Api</span>
-</span><span class='line'>  <span class="k">module</span> <span class="nn">V1</span>
-</span><span class='line'>    <span class="k">class</span> <span class="nc">SearchController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-</span><span class='line'>      <span class="n">before_filter</span> <span class="ss">:restrict_access</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">def</span> <span class="nf">youtube</span>
-</span><span class='line'>        <span class="c1">#code that searches for youtube videos</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">def</span> <span class="nf">restrict_access</span>
-</span><span class='line'>        <span class="n">app</span> <span class="o">=</span> <span class="no">Application</span><span class="o">.</span><span class="n">find_by_access_token</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:access_token</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">head</span> <span class="ss">:unauthorized</span> <span class="k">unless</span> <span class="n">app</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Updating the controller in order to send an unauthorized response if the access key is invalid. Now in order to make a request the user has to send in the right access_token in the parameters. Also make sure to not make the access_token field accessible using attr_accessible or in rails 4 you can do the following:</p>
-
-<figure class='code'><figcaption><span>app/controllers/applications.rb</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">ApplicationsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-</span><span class='line'>  <span class="c1">#code for controller</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">create</span>
-</span><span class='line'>    <span class="vi">@application</span> <span class="o">=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">application_params</span><span class="p">)</span>
-</span><span class='line'>    <span class="c1">#code to save application</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">application_params</span>
-</span><span class='line'>    <span class="n">params</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="ss">:application</span><span class="p">)</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Instead of directly passing in the params[:application] we pass the build method a method itself. This private method makes sure to only permit the application name.</p>
-
-<p>Since the output of my controllers were already in JSON there was no need for <a href="https://github.com/nesquena/rabl">RABL</a>. Also for those looking for something lightweight can have a look at <a href="https://github.com/rails-api/rails-api">Rails-API</a>. This is enough to get you started if you any questions leave comments and I shall address them.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/09/11/your-code-statistics/">How Many Lines of Code Is Your Project?</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -612,174 +365,44 @@ There are other columns you can add to the model if needed such as permissions, 
   
 
 
-<time datetime="2013-09-11T00:34:00+04:00" pubdate data-updated="true">Sep 11<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A client just asked me, how many lines of code is the project?
-Despite being an absurd question, and having no relation with the project at all this made me really curious to find out.
-After a quick web search, I stumbled upon this piece of code (Bare in find this is for a rails app).</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>find ./app -type f | xargs cat | wc -l</span></code></pre></td></tr></table></div></figure>
-
-
-<p>What does this code do?</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>find</span></code></pre></td></tr></table></div></figure>
-
-
-<p> is a shell method that searches through the files.
-The next part,</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./app -type f</span></code></pre></td></tr></table></div></figure>
-
-
-<p> searches the app directory. You can search any directory you want, this looks at the app directory which in a rails app holds majority of the code you write.
-After that you list the type you want. If you search without the type you get both directories and files. In this case we just want files, hence the &ldquo;f&rdquo;. This is an alias for &ldquo;file&rdquo;.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>| xargs</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We need to use xargs over here which reads the STDIN stream data and coverts each line into space separated arguments to the command.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cat |</span></code></pre></td></tr></table></div></figure>
-
-
-<p>reads the output and pipes it out to the next step of commands</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>wc -l</span></code></pre></td></tr></table></div></figure>
-
-
-<p>&ldquo;wc&rdquo; is short for word count. This gives 3 results. The first being the number of new lines, the second being the number of words and last the number of characters. However we are interested in the lines, hence the command &ldquo;-l&rdquo;.
-This is a cool little script to get an overview of the size of the codebase.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2013-11-03T00:01:00+04:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2013</time>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/08/24/advice-to-people-learning-how-to-code/">Advice to People Learning How to Code</a></h1>
-    
-    
-      <p class="meta">
-        
 
-
-
-
-
-
-
-
+<span class="categories">
   
+    <a class='category' href='/blog/categories/api/'>api</a>, <a class='category' href='/blog/categories/code/'>code</a>, <a class='category' href='/blog/categories/facebook/'>facebook</a>
+  
+</span>
 
 
-<time datetime="2013-08-24T01:37:00+04:00" pubdate data-updated="true">Aug 24<span>th</span>, 2013</time>
-        
-      </p>
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>There is a lot of advice thrown out there to people who are just starting out to learn how to program. The learning never stops. It&rsquo;s been a crazy journey over the past two years, from spending countless hours alone trying to learn things by myself. To enrolling into a <a href="http://bloc.io">Bloc</a> course and then finally the intensive 12 weeks of <a href="http://devbootcamp.com">Dev Bootcamp</a>. Now I am a contract web developer who is tackling challenging problems, learning new things on a daily basis and loving every moment of it.</p>
-
-<p>So what is my piece of advice? Build things. There is no secret formula, book or programming language. The only way to improve is to build things. I don&rsquo;t care what programming language you use (<a href="http://www.ruby-lang.org/en/">Ruby</a> is awesome), just build things. Half baked things, things people would use or things you want to use. Basically anything!</p>
-
-<p>I&rsquo;ll be honest with you. I wasted the starting months while learning. I kept devouring new books, latest challenges of <a href="http://codecademy.com">codecademy</a> and anything that kept me away from uncertainty. This just filled my ego. I wasn&rsquo;t progressing as a programmer, I was just getting comfortable with syntax. I was lying to myself that I was improving. The bottom line is, the only way to improve is to build things.</p>
-
-<h3>I have a lot of time but I don&rsquo;t know what to build.</h3>
-
-<p>Stop feeding yourself excuses. You use a lot of websites on a daily basis. How about build a clone of it? Try exercising different muscles.
-Want some ideas?</p>
-
-<ul>
-<li>  <a href="http://www.dreamincode.net/forums/topic/78802-martyr2s-mega-project-ideas-list/">Martyr2&rsquo;S Mega Project Ideas List</a></li>
-<li>  <a href="http://jenniferdewalt.com/">180 websites in 180 days</a></li>
-</ul>
-
-
-<p>Your task over here is not to make money with these things, I am not saying you can&rsquo;t, but your main focus should be to get as much experience under your belt as possible.</p>
-
-<h3>I don&rsquo;t have enough time.</h3>
-
-<p>Lies. If this really matters to you, you will find time. Skip an episode of your favorite TV show, don&rsquo;t go out for that movie or cancel a night out. Carve out a set time couple of times a week, more if you can. And just code. Think of it as an appointment that you can&rsquo;t miss, nothing else matters during those hours.</p>
-
-<p>You are not doing this to get a job or to make your <a href="http://github.com">github</a> look impressive. It can, but your main objective here is to get better at coding. The idea here is to level up, tackle areas you are unfamiliar about and embrace the uncertainty. It&rsquo;s very easy to keep building things that don&rsquo;t stretch your skill level.</p>
-
-<p>Go code. Don&rsquo;t think about writing code, just code.</p>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates/" data-via="" data-counturl="http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/11/the-world-is-ready-for-my-thoughts/">The World Is Ready for My Thoughts.</a></h1>
-    
-    
-      <p class="meta">
-        
+        <a class="basic-alignment left" href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/" title="Previous Post: Creating a Secure and Versioned API in Rails">&laquo; Creating a Secure and Versioned API in Rails</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-11T12:36:00+04:00" pubdate data-updated="true">May 11<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I turned around to Stephane and said, &ldquo;I think the world is ready for my thoughts.&rdquo; He said, you mean you are ready to expose your thoughts to the world. I thought about that for a second, and realized how true that is. I have been wanting to start a blog since a year now, but I kept delaying it because I was afraid about what people might think. In reality nobody cares about you, all they think about is themselves.
-Enough of that bullshit. I have finally reached a state of mind, where I don&rsquo;t mind putting myself out there.</p>
-
-<h2>Tell me about Yourself.</h2>
-
-<p>The interview question I dread.
-Recently graduated from high school in Dubai. Wandered for a few months and initially decided to not follow the traditional path of college. Completed Dev Bootcamp, a 9 week intensive course on web development, on April 19th 2013. Currently an aspiring web developer. I love learning and exploring new things.
-This is a brief overview of my journey over the past couple of years, read the whole account here.</p>
-
-<p>My writings are going to be about the things I learn and my ramblings. Mainly about my journey as a software developer.</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  
-  
+  </section>
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -816,6 +439,7 @@ This is a brief overview of my journey over the past couple of years, read the w
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -830,7 +454,10 @@ This is a brief overview of my journey over the past couple of years, read the w
       var disqus_shortname = 'shivamd';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates/';
+        var disqus_url = 'http://shivamd.github.io/blog/2013/11/03/facebook-realtime-updates/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
