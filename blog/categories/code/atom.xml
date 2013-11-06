@@ -4,7 +4,7 @@
   <title><![CDATA[Category: code | Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/blog/categories/code/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-04T00:37:53+04:00</updated>
+  <updated>2013-11-07T03:15:27+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Receiving Email in a Rails App]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app/"/>
+    <updated>2013-11-07T02:07:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app</id>
+    <content type="html"><![CDATA[<p>Receiving email in a Rails app can be tricky. The Action Mailer library has minimal support for this and it can be quite tricky. This is where SendGrid&rsquo;s <a href="http://sendgrid.com/docs/API_Reference/Webhooks/parse.html">parse API</a> comes in along with the gem released by ThoughtBot called <a href="http://github.com/thoughtbot/griddler">Griddler</a>.</p>
+
+<h3>Setup</h3>
+
+<p>Start of by adding the griddler gem to your gemfile.</p>
+
+<p><code>
+gem "griddler"
+</code>
+Followed by a bundle install. If you run rake routes, you will see Griddler has created a route to receive mails on.
+If you need to edit this route, you can paste it in your routes file.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>config/routes.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">post</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="o">/</span><span class="n">email_processor</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span> <span class="o">=&gt;</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">griddler</span><span class="o">/</span><span class="n">emails</span><span class="c1">#create&amp;rsquo;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>By default Griddler will look for an EmailProcessor class. You can create one in the models folder.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/models/email_processor.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">EmailProcessor</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">process</span><span class="p">(</span><span class="n">email</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;#create models, process reports etc.</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>These are the following attributes available on the email received.
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.to
+</span><span class='line'>.from
+</span><span class='line'>.subject
+</span><span class='line'>.body
+</span><span class='line'>.raw_text
+</span><span class='line'>.raw_html
+</span><span class='line'>.raw_body
+</span><span class='line'>.attachments
+</span><span class='line'>.headers
+</span><span class='line'>.raw_headers</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Email server setup</h3>
+
+<p>For my app I ended up using SendGrid, which has an add-on for Heroku. Once your account is setup, go the <a href="http://sendgrid.com/developer/reply">parse webhook settings page</a>.</p>
+
+<p><img class="center" src="/images/sendgrid_settings.png"></p>
+
+<p><strong>In order for this to work you need a domain name</strong>. Your site doesn&rsquo;t necessarily have to be deployed on it. Enter the domain you are going to use in the domain field. For the URI enter the route where you want to receive mails. I have used <a href="http://ngrok.com/">Ngrok</a> as I wanted to test it in development.</p>
+
+<p>The last part needed in order to receive emails is to point your domain&rsquo;s MX record to, in this case, mx.sendgrid.net.
+What is a MX record?
+The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
+Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#105;&#x6e;&#102;&#111;&#x40;&#121;&#111;&#x75;&#114;&#x64;&#111;&#109;&#97;&#105;&#110;&#x2e;&#x63;&#111;&#109;&#x2e;">&#105;&#110;&#102;&#111;&#x40;&#121;&#x6f;&#117;&#x72;&#x64;&#111;&#x6d;&#97;&#105;&#110;&#x2e;&#x63;&#111;&#x6d;&#x2e;</a></p>
+
+<p><img class="center" src="/images/namecheap.png"></p>
+
+<p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
+In my case this would be <a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#x69;&#110;&#102;&#111;&#64;&#115;&#104;&#105;&#118;&#97;&#x6d;&#100;&#x61;&#x72;&#121;&#x61;&#x6e;&#x61;&#x6e;&#x69;&#46;&#x63;&#111;&#x6d;">&#x69;&#x6e;&#102;&#111;&#x40;&#115;&#x68;&#105;&#118;&#x61;&#109;&#100;&#97;&#114;&#121;&#97;&#x6e;&#97;&#110;&#105;&#x2e;&#99;&#x6f;&#109;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
+
+<h3>Why would I want to receive email?</h3>
+
+<p>That&rsquo;s a good question. A lot of sites create their support tickets in this way. Once you email support@domain.com, it parses the email and creates the ticket. Also here is a list of creative ideas:</p>
+
+<ul>
+<li><a href="https://thebirdy.com/">The Birdy</a></li>
+<li><a href="http://www.nudgemail.com/">Nudge Mail</a></li>
+<li><a href="https://idonethis.com/">IDoneThis</a></li>
+</ul>
+
+
+<p>Hope this was useful let me know if you come across any roadblocks.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Nested Attributes in Rails 4]]></title>
@@ -841,40 +941,6 @@ reads the output and pipes it out to the next step of commands
 </pre></td><td class='code'><pre><code class=''><span class='line'>wc -l</span></code></pre></td></tr></table></div></figure></notextile></div>
 &ldquo;wc&rdquo; is short for word count. This gives 3 results. The first being the number of new lines, the second being the number of words and last the number of characters. However we are interested in the lines, hence the command &ldquo;-l&rdquo;.
 This is a cool little script to get an overview of the size of the codebase.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Advice to people learning how to code]]></title>
-    <link href="http://shivamd.github.io/blog/2013/08/24/advice-to-people-learning-how-to-code/"/>
-    <updated>2013-08-24T01:37:00+04:00</updated>
-    <id>http://shivamd.github.io/blog/2013/08/24/advice-to-people-learning-how-to-code</id>
-    <content type="html"><![CDATA[<p>There is a lot of advice thrown out there to people who are just starting out to learn how to program. The learning never stops. It&rsquo;s been a crazy journey over the past two years, from spending countless hours alone trying to learn things by myself. To enrolling into a <a href="http://bloc.io">Bloc</a> course and then finally the intensive 12 weeks of <a href="http://devbootcamp.com">Dev Bootcamp</a>. Now I am a contract web developer who is tackling challenging problems, learning new things on a daily basis and loving every moment of it.</p>
-
-<p>So what is my piece of advice? Build things. There is no secret formula, book or programming language. The only way to improve is to build things. I don&rsquo;t care what programming language you use (<a href="http://www.ruby-lang.org/en/">Ruby</a> is awesome), just build things. Half baked things, things people would use or things you want to use. Basically anything!</p>
-
-<p>I&rsquo;ll be honest with you. I wasted the starting months while learning. I kept devouring new books, latest challenges of <a href="http://codecademy.com">codecademy</a> and anything that kept me away from uncertainty. This just filled my ego. I wasn&rsquo;t progressing as a programmer, I was just getting comfortable with syntax. I was lying to myself that I was improving. The bottom line is, the only way to improve is to build things.</p>
-
-<h3>I have a lot of time but I don&rsquo;t know what to build.</h3>
-
-<p>Stop feeding yourself excuses. You use a lot of websites on a daily basis. How about build a clone of it? Try exercising different muscles.
-Want some ideas?</p>
-
-<ul>
-<li>  <a href="http://www.dreamincode.net/forums/topic/78802-martyr2s-mega-project-ideas-list/">Martyr2&rsquo;S Mega Project Ideas List</a></li>
-<li>  <a href="http://jenniferdewalt.com/">180 websites in 180 days</a></li>
-</ul>
-
-
-<p>Your task over here is not to make money with these things, I am not saying you can&rsquo;t, but your main focus should be to get as much experience under your belt as possible.</p>
-
-<h3>I don&rsquo;t have enough time.</h3>
-
-<p>Lies. If this really matters to you, you will find time. Skip an episode of your favorite TV show, don&rsquo;t go out for that movie or cancel a night out. Carve out a set time couple of times a week, more if you can. And just code. Think of it as an appointment that you can&rsquo;t miss, nothing else matters during those hours.</p>
-
-<p>You are not doing this to get a job or to make your <a href="http://github.com">github</a> look impressive. It can, but your main objective here is to get better at coding. The idea here is to level up, tackle areas you are unfamiliar about and embrace the uncertainty. It&rsquo;s very easy to keep building things that don&rsquo;t stretch your skill level.</p>
-
-<p>Go code. Don&rsquo;t think about writing code, just code.</p>
 ]]></content>
   </entry>
   

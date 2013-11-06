@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Receiving Email in a Rails App - Shivam Daryanani's Blog</title>
+  <meta name="author" content="Shivam Daryanani">
+
+  
+  <meta name="description" content="Receiving email in a Rails app can be tricky. The Action Mailer library has minimal support for this and it can be quite tricky. This is where &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Shivam Daryanani's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Shivam Daryanani's Blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shivamd.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Receiving Email in a Rails App</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-07T02:07:00+04:00" pubdate data-updated="true">Nov 7<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Receiving email in a Rails app can be tricky. The Action Mailer library has minimal support for this and it can be quite tricky. This is where SendGrid&rsquo;s <a href="http://sendgrid.com/docs/API_Reference/Webhooks/parse.html">parse API</a> comes in along with the gem released by ThoughtBot called <a href="http://github.com/thoughtbot/griddler">Griddler</a>.</p>
+
+<h3>Setup</h3>
+
+<p>Start of by adding the griddler gem to your gemfile.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gem "griddler"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Followed by a bundle install. If you run rake routes, you will see Griddler has created a route to receive mails on.
+If you need to edit this route, you can paste it in your routes file.</p>
+
+<figure class='code'><figcaption><span>config/routes.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">post</span> <span class="s1">&#39;/email_processor&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;griddler/emails#create&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By default Griddler will look for an EmailProcessor class. You can create one in the models folder.</p>
+
+<figure class='code'><figcaption><span>app/models/email_processor.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">EmailProcessor</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">process</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1">#create models, process reports etc.</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These are the following attributes available on the email received.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.to 
+</span><span class='line'>.from
+</span><span class='line'>.subject
+</span><span class='line'>.body
+</span><span class='line'>.raw_text
+</span><span class='line'>.raw_html
+</span><span class='line'>.raw_body
+</span><span class='line'>.attachments
+</span><span class='line'>.headers
+</span><span class='line'>.raw_headers</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Email server setup</h3>
+
+<p>For my app I ended up using SendGrid, which has an add-on for Heroku. Once your account is setup, go the <a href="http://sendgrid.com/developer/reply">parse webhook settings page</a>.</p>
+
+<p><img class="center" src="/images/sendgrid_settings.png"></p>
+
+<p><strong>In order for this to work you need a domain name</strong>. Your site doesn&rsquo;t necessarily have to be deployed on it. Enter the domain you are going to use in the domain field. For the URI enter the route where you want to receive mails. I have used <a href="http://ngrok.com/">Ngrok</a> as I wanted to test it in development.</p>
+
+<p>The last part needed in order to receive emails is to point your domain&rsquo;s MX record to, in this case, mx.sendgrid.net.
+What is a MX record?
+The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
+Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#105;&#110;&#x66;&#x6f;&#x40;&#x79;&#111;&#117;&#114;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#x2e;&#99;&#x6f;&#109;&#46;">&#x69;&#x6e;&#102;&#111;&#x40;&#121;&#x6f;&#x75;&#114;&#x64;&#111;&#x6d;&#97;&#x69;&#110;&#x2e;&#x63;&#111;&#x6d;&#x2e;</a></p>
+
+<p><img class="center" src="/images/namecheap.png"></p>
+
+<p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
+In my case this would be <a href="&#109;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#105;&#x6e;&#x66;&#x6f;&#64;&#115;&#x68;&#105;&#x76;&#x61;&#x6d;&#x64;&#97;&#x72;&#x79;&#x61;&#x6e;&#97;&#x6e;&#105;&#x2e;&#x63;&#111;&#x6d;">&#x69;&#110;&#102;&#x6f;&#64;&#x73;&#104;&#x69;&#118;&#x61;&#109;&#x64;&#97;&#x72;&#x79;&#x61;&#110;&#x61;&#110;&#105;&#46;&#x63;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
+
+<h3>Why would I want to receive email?</h3>
+
+<p>That&rsquo;s a good question. A lot of sites create their support tickets in this way. Once you email support@domain.com, it parses the email and creates the ticket. Also here is a list of creative ideas:</p>
+
+<ul>
+<li><a href="https://thebirdy.com/">The Birdy</a></li>
+<li><a href="http://www.nudgemail.com/">Nudge Mail</a></li>
+<li><a href="https://idonethis.com/">IDoneThis</a></li>
+</ul>
+
+
+<p>Hope this was useful let me know if you come across any roadblocks.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Shivam Daryanani</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-07T02:07:00+04:00" pubdate data-updated="true">Nov 7<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/code/'>code</a>, <a class='category' href='/blog/categories/email/'>email</a>, <a class='category' href='/blog/categories/rails/'>rails</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app/" data-via="" data-counturl="http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/11/03/nested-attributes-in-rails-4/" title="Previous Post: Nested Attributes in Rails 4">&laquo; Nested Attributes in Rails 4</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/07/receiving-email-in-a-rails-app/">Receiving Email in a Rails App</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/03/nested-attributes-in-rails-4/">Nested Attributes in Rails 4</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/03/facebook-realtime-updates/">Facebook Realtime Updates in a Rails Application</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/">Creating a Secure and Versioned API in Rails</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/11/your-code-statistics/">How Many Lines of Code Is Your Project?</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Shivam Daryanani -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'shivamd';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app/';
+        var disqus_url = 'http://shivamd.github.io/blog/2013/11/07/receiving-email-in-a-rails-app/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
