@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Create Dynamic Cron Jobs in Rails"
+title: "Creating Dynamic Cron Jobs in Rails"
 date: 2013-11-09 03:38
 comments: true
 categories: ["rails","cron", "delayed-jobs"]
