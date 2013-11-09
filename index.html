@@ -9,7 +9,7 @@
   <meta name="author" content="Shivam Daryanani">
 
   
-  <meta name="description" content="Receiving email in a Rails app can be tricky. The Action Mailer library has minimal support for this and it can be quite tricky. This is where &hellip;">
+  <meta name="description" content="I have used the likes of Delayed Jobs and Sidekiq in previous apps, but for an app I am working on I had to create cron jobs based on user settings. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,108 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/">Create Dynamic Cron Jobs in Rails</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-09T03:38:00+04:00" pubdate data-updated="true">Nov 9<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have used the likes of <a href="https://github.com/collectiveidea/delayed_job">Delayed Jobs</a> and <a href="https://github.com/mperham/sidekiq">Sidekiq</a> in previous apps, but for an app I am working on I had to create cron jobs based on user settings. I needed someway to iterate over the user&rsquo;s settings and create the crons needed. I came across the <a href="https://github.com/javan/whenever">whenever</a> gem that makes it easy to create cron jobs. With a little tweaking I was able to create cron jobs based on a user&rsquo;s setting.</p>
+
+<h3>Gem installation</h3>
+
+<p>In your Gemfile:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;whenever&#39;</span><span class="p">,</span> <span class="nb">require</span> <span class="ss">:false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The reason we add require false is because whenever creates cron jobs outside of the rails app.</p>
+
+<p>Next run the following command from the root of your app:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">wheneverize</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will create a schedule.rb in the config file, this is where your logic for setting up crons will be. You can have a look at this <a href="http://railscasts.com/episodes/164-cron-in-ruby">railscasts</a> on how to setup crons.</p>
+
+<h3>Requiring the rails app</h3>
+
+<p>In order to have access to your models inside the file, you need to require the application. This can be done with the following line.</p>
+
+<figure class='code'><figcaption><span>config/scheduler.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;./&quot;</span><span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/environment.rb&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will load up the application which gives us access to our rails models. Now let&rsquo;s say you have many users with different reminder settings.</p>
+
+<figure class='code'><figcaption><span>config/scheduler.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;./&quot;</span><span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/environment.rb&quot;</span>
+</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">/log/cron.log&quot;</span> <span class="c1">#logs</span>
+</span><span class='line'><span class="vi">@users</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">all</span>
+</span><span class='line'><span class="vi">@users</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">every</span> <span class="n">user</span><span class="o">.</span><span class="n">reminder_frequency</span><span class="o">.</span><span class="n">to_sym</span><span class="p">,</span> <span class="ss">at</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">reminder_time</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">runner</span> <span class="s2">&quot;user.send_reminder&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>reminder_frequency</strong> can contain for example: &ldquo;sunday&rdquo; or &ldquo;weekday&#8221;<br/>
+<strong>reminder_time</strong> contains the timestamp: &#8220;6:00pm&rdquo;</p>
+
+<p>This will create the cron jobs for every user.
+Running the following command will confirm that:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>bundle <span class="nb">exec </span>whenever
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are many different solutions out there for scheduled jobs, whenever makes it really easy with it&rsquo;s syntax and simplicity.
+Let me know if you have any questions.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -163,12 +265,12 @@ If you need to edit this route, you can paste it in your routes file.</p>
 What is a MX record?
 The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
 Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
-You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#58;&#105;&#110;&#x66;&#x6f;&#x40;&#x79;&#111;&#117;&#114;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#x2e;&#99;&#x6f;&#109;&#46;">&#x69;&#x6e;&#102;&#111;&#x40;&#121;&#x6f;&#x75;&#114;&#x64;&#111;&#x6d;&#97;&#x69;&#110;&#x2e;&#x63;&#111;&#x6d;&#x2e;</a></p>
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#105;&#110;&#102;&#x6f;&#x40;&#x79;&#111;&#117;&#x72;&#100;&#111;&#x6d;&#97;&#x69;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#105;&#110;&#x66;&#x6f;&#x40;&#121;&#x6f;&#x75;&#114;&#100;&#111;&#109;&#97;&#105;&#x6e;&#x2e;&#x63;&#111;&#109;&#x2e;</a></p>
 
 <p><img class="center" src="/images/namecheap.png"></p>
 
 <p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
-In my case this would be <a href="&#109;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#105;&#x6e;&#x66;&#x6f;&#64;&#115;&#x68;&#105;&#x76;&#x61;&#x6d;&#x64;&#97;&#x72;&#x79;&#x61;&#x6e;&#97;&#x6e;&#105;&#x2e;&#x63;&#111;&#x6d;">&#x69;&#110;&#102;&#x6f;&#64;&#x73;&#104;&#x69;&#118;&#x61;&#109;&#x64;&#97;&#x72;&#x79;&#x61;&#110;&#x61;&#110;&#105;&#46;&#x63;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+In my case this would be <a href="&#109;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#x69;&#110;&#102;&#x6f;&#64;&#115;&#104;&#105;&#118;&#97;&#x6d;&#x64;&#x61;&#x72;&#x79;&#x61;&#110;&#x61;&#x6e;&#x69;&#46;&#x63;&#x6f;&#x6d;">&#x69;&#x6e;&#x66;&#111;&#x40;&#115;&#x68;&#105;&#118;&#x61;&#x6d;&#x64;&#x61;&#114;&#x79;&#x61;&#110;&#97;&#110;&#x69;&#46;&#x63;&#x6f;&#109;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
 The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
 
 <h3>Why would I want to receive email?</h3>
@@ -1162,6 +1264,10 @@ This is a brief overview of my journey over the past couple of years, read the w
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/">Create Dynamic Cron Jobs in Rails</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/07/receiving-email-in-a-rails-app/">Receiving Email in a Rails App</a>
       </li>
     
@@ -1175,10 +1281,6 @@ This is a brief overview of my journey over the past couple of years, read the w
     
       <li class="post">
         <a href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/">Creating a Secure and Versioned API in Rails</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/11/your-code-statistics/">How Many Lines of Code Is Your Project?</a>
       </li>
     
   </ul>

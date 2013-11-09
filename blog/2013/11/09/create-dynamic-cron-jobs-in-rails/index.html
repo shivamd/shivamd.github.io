@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Create Dynamic Cron Jobs in Rails - Shivam Daryanani's Blog</title>
+  <meta name="author" content="Shivam Daryanani">
+
+  
+  <meta name="description" content="I have used the likes of Delayed Jobs and Sidekiq in previous apps, but for an app I am working on I had to create cron jobs based on user settings. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Shivam Daryanani's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Shivam Daryanani's Blog</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:shivamd.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Create Dynamic Cron Jobs in Rails</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-09T03:38:00+04:00" pubdate data-updated="true">Nov 9<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I have used the likes of <a href="https://github.com/collectiveidea/delayed_job">Delayed Jobs</a> and <a href="https://github.com/mperham/sidekiq">Sidekiq</a> in previous apps, but for an app I am working on I had to create cron jobs based on user settings. I needed someway to iterate over the user&rsquo;s settings and create the crons needed. I came across the <a href="https://github.com/javan/whenever">whenever</a> gem that makes it easy to create cron jobs. With a little tweaking I was able to create cron jobs based on a user&rsquo;s setting.</p>
+
+<h3>Gem installation</h3>
+
+<p>In your Gemfile:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="s1">&#39;whenever&#39;</span><span class="p">,</span> <span class="nb">require</span> <span class="ss">:false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The reason we add require false is because whenever creates cron jobs outside of the rails app.</p>
+
+<p>Next run the following command from the root of your app:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">wheneverize</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will create a schedule.rb in the config file, this is where your logic for setting up crons will be. You can have a look at this <a href="http://railscasts.com/episodes/164-cron-in-ruby">railscasts</a> on how to setup crons.</p>
+
+<h3>Requiring the rails app</h3>
+
+<p>In order to have access to your models inside the file, you need to require the application. This can be done with the following line.</p>
+
+<figure class='code'><figcaption><span>config/scheduler.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;./&quot;</span><span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/environment.rb&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will load up the application which gives us access to our rails models. Now let&rsquo;s say you have many users with different reminder settings.</p>
+
+<figure class='code'><figcaption><span>config/scheduler.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;./&quot;</span><span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/environment.rb&quot;</span>
+</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">path</span><span class="si">}</span><span class="s2">/log/cron.log&quot;</span> <span class="c1">#logs</span>
+</span><span class='line'><span class="vi">@users</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">all</span>
+</span><span class='line'><span class="vi">@users</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">every</span> <span class="n">user</span><span class="o">.</span><span class="n">reminder_frequency</span><span class="o">.</span><span class="n">to_sym</span><span class="p">,</span> <span class="ss">at</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">reminder_time</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">runner</span> <span class="s2">&quot;user.send_reminder&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>reminder_frequency</strong> can contain for example: &ldquo;sunday&rdquo; or &ldquo;weekday&#8221;<br/>
+<strong>reminder_time</strong> contains the timestamp: &#8220;6:00pm&rdquo;</p>
+
+<p>This will create the cron jobs for every user.
+Running the following command will confirm that:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>bundle <span class="nb">exec </span>whenever
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are many different solutions out there for scheduled jobs, whenever makes it really easy with it&rsquo;s syntax and simplicity.
+Let me know if you have any questions.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Shivam Daryanani</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-09T03:38:00+04:00" pubdate data-updated="true">Nov 9<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/cron/'>cron</a>, <a class='category' href='/blog/categories/delayed-jobs/'>delayed-jobs</a>, <a class='category' href='/blog/categories/rails/'>rails</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/" data-via="" data-counturl="http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/11/07/receiving-email-in-a-rails-app/" title="Previous Post: Receiving Email in a Rails App">&laquo; Receiving Email in a Rails App</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/">Create Dynamic Cron Jobs in Rails</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/07/receiving-email-in-a-rails-app/">Receiving Email in a Rails App</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/03/nested-attributes-in-rails-4/">Nested Attributes in Rails 4</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/03/facebook-realtime-updates/">Facebook Realtime Updates in a Rails Application</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/01/creating-a-secure-and-versioned-api-in-rails/">Creating a Secure and Versioned API in Rails</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Shivam Daryanani -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'shivamd';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/';
+        var disqus_url = 'http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

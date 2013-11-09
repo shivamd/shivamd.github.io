@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: delayed-jobs | Shivam Daryanani's Blog]]></title>
+  <link href="http://shivamd.github.io/blog/categories/delayed-jobs/atom.xml" rel="self"/>
+  <link href="http://shivamd.github.io/"/>
+  <updated>2013-11-09T04:13:40+04:00</updated>
+  <id>http://shivamd.github.io/</id>
+  <author>
+    <name><![CDATA[Shivam Daryanani]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Create Dynamic Cron Jobs in Rails]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/"/>
+    <updated>2013-11-09T03:38:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/09/create-dynamic-cron-jobs-in-rails</id>
+    <content type="html"><![CDATA[<p>I have used the likes of <a href="https://github.com/collectiveidea/delayed_job">Delayed Jobs</a> and <a href="https://github.com/mperham/sidekiq">Sidekiq</a> in previous apps, but for an app I am working on I had to create cron jobs based on user settings. I needed someway to iterate over the user&rsquo;s settings and create the crons needed. I came across the <a href="https://github.com/javan/whenever">whenever</a> gem that makes it easy to create cron jobs. With a little tweaking I was able to create cron jobs based on a user&rsquo;s setting.</p>
+
+<h3>Gem installation</h3>
+
+<p>In your Gemfile:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">whenever</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;,</span> <span class="nb">require</span> <span class="ss">:false</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+The reason we add require false is because whenever creates cron jobs outside of the rails app.</p>
+
+<p>Next run the following command from the root of your app:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">wheneverize</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+This will create a schedule.rb in the config file, this is where your logic for setting up crons will be. You can have a look at this <a href="http://railscasts.com/episodes/164-cron-in-ruby">railscasts</a> on how to setup crons.</p>
+
+<h3>Requiring the rails app</h3>
+
+<p>In order to have access to your models inside the file, you need to require the application. This can be done with the following line.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>config/scheduler.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">.</span><span class="n">/</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span><span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;</span><span class="no">FILE</span><span class="o">&lt;</span><span class="sr">/strong&gt;) + &amp;ldquo;/en</span><span class="n">vironment</span><span class="o">.</span><span class="n">rb</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This will load up the application which gives us access to our rails models. Now let&rsquo;s say you have many users with different reminder settings.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>config/scheduler.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">.</span><span class="n">/</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span><span class="o">+</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;</span><span class="no">FILE</span><span class="o">&lt;</span><span class="sr">/strong&gt;) + &amp;ldquo;/en</span><span class="n">vironment</span><span class="o">.</span><span class="n">rb</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="c1">#{path}/log/cron.log&amp;rdquo; #logs</span>
+</span><span class='line'><span class="vi">@users</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">all</span>
+</span><span class='line'><span class="vi">@users</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">every</span> <span class="n">user</span><span class="o">.</span><span class="n">reminder_frequency</span><span class="o">.</span><span class="n">to_sym</span><span class="p">,</span> <span class="ss">at</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">reminder_time</span> <span class="k">do</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;runner &quot;user.send_reminder&quot;</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<strong>reminder_frequency</strong> can contain for example: &ldquo;sunday&rdquo; or &ldquo;weekday"<br/>
+<strong>reminder_time</strong> contains the timestamp: "6:00pm&rdquo;</p>
+
+<p>This will create the cron jobs for every user.
+Running the following command will confirm that:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>bundle <span class="nb">exec </span>whenever
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+There are many different solutions out there for scheduled jobs, whenever makes it really easy with it&rsquo;s syntax and simplicity.
+Let me know if you have any questions.</p>
+]]></content>
+  </entry>
+  
+</feed>
