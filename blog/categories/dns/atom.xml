@@ -4,7 +4,7 @@
   <title><![CDATA[Category: dns | Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/blog/categories/dns/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-14T11:19:07+04:00</updated>
+  <updated>2013-11-16T23:50:30+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -18,7 +18,7 @@
     <link href="http://shivamd.github.io/blog/2013/11/14/creating-email-accounts-on-your-domain-dynamically/"/>
     <updated>2013-11-14T09:40:00+04:00</updated>
     <id>http://shivamd.github.io/blog/2013/11/14/creating-email-accounts-on-your-domain-dynamically</id>
-    <content type="html"><![CDATA[<p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#x6d;&#x61;&#x69;&#108;&#x74;&#x6f;&#x3a;&#106;&#111;&#104;&#x6e;&#100;&#111;&#101;&#64;&#109;&#x79;&#x64;&#111;&#x6d;&#x61;&#x69;&#x6e;&#x2e;&#x63;&#111;&#109;&#46;">&#106;&#x6f;&#104;&#110;&#100;&#x6f;&#101;&#x40;&#109;&#x79;&#100;&#111;&#x6d;&#x61;&#105;&#x6e;&#x2e;&#x63;&#x6f;&#109;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
+    <content type="html"><![CDATA[<p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#106;&#x6f;&#x68;&#x6e;&#100;&#x6f;&#101;&#64;&#109;&#121;&#x64;&#111;&#109;&#97;&#105;&#110;&#46;&#99;&#x6f;&#x6d;&#46;">&#x6a;&#111;&#104;&#110;&#100;&#x6f;&#x65;&#x40;&#x6d;&#121;&#x64;&#111;&#x6d;&#97;&#105;&#110;&#x2e;&#x63;&#x6f;&#x6d;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
 
 <h3>Attempt#1</h3>
 
@@ -77,7 +77,7 @@ In order to create an email forward, you will need to make a post request:
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#x6f;&#x68;&#110;&#x40;&#x65;&#120;&#x61;&#x6d;&#112;&#x6c;&#x65;&#x2e;&#x63;&#111;&#109;">&#106;&#111;&#x68;&#x6e;&#x40;&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#x2e;&#99;&#111;&#109;</a> will be forwarded to <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#115;&#111;&#x6d;&#x65;&#x6f;&#110;&#x65;&#x40;&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#109;&#x2e;">&#115;&#111;&#109;&#x65;&#x6f;&#x6e;&#x65;&#64;&#101;&#120;&#97;&#109;&#112;&#x6c;&#101;&#46;&#x63;&#x6f;&#x6d;&#x2e;</a></p>
+This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#106;&#111;&#x68;&#x6e;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#101;&#x2e;&#x63;&#x6f;&#x6d;">&#106;&#x6f;&#x68;&#x6e;&#64;&#101;&#120;&#x61;&#x6d;&#112;&#108;&#101;&#x2e;&#x63;&#x6f;&#x6d;</a> will be forwarded to <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#115;&#111;&#109;&#101;&#x6f;&#x6e;&#x65;&#64;&#x65;&#x78;&#97;&#109;&#x70;&#108;&#x65;&#46;&#99;&#x6f;&#109;&#46;">&#115;&#x6f;&#109;&#x65;&#111;&#x6e;&#101;&#64;&#101;&#120;&#97;&#109;&#112;&#108;&#101;&#46;&#x63;&#111;&#109;&#x2e;</a></p>
 
 <p>You can send a post request with headers in a Rails app using the <code>system</code> method(you&rsquo;ll paste in the same script)  but I prefer to make a post request using the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem as it&rsquo;s cleaner. The same post request in ruby:</p>
 

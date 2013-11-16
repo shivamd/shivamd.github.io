@@ -4,7 +4,7 @@
   <title><![CDATA[Category: code | Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/blog/categories/code/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-14T11:19:07+04:00</updated>
+  <updated>2013-11-16T23:50:30+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,87 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Harnessing the Power of Ctags in Vim]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/16/harnessing-the-power-of-ctags-in-vim/"/>
+    <updated>2013-11-16T22:51:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/16/harnessing-the-power-of-ctags-in-vim</id>
+    <content type="html"><![CDATA[<p>What is Ctags? It&rsquo;s a tool that creates an index file of functions, variables, class names and so on based on the language. This makes it easy to navigate a code base, and makes you feel like a badass.</p>
+
+<h3>The setup.</h3>
+
+<p>Ctags come shipped in with MacOS but you&rsquo;ll want the exuberant Ctags.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install ctags
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>If you did the installation right, you should get the following output when running <code>ctags --version</code></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Exuberant Ctags 5.8, Copyright &copy; 1996-2009 Darren Hiebert
+</span><span class='line'>Compiled: Nov 15 2013, 00:46:27  Addresses: &lt;a href="&#109;&#x61;&#105;&#108;&#116;&#111;&#x3a;&#x64;&#x68;&#105;&#101;&#x62;&#x65;&#114;&#x74;&#x40;&#x75;&#x73;&#x65;&#x72;&#115;&#46;&#x73;&#111;&#117;&#x72;&#x63;&#x65;&#x66;&#111;&#114;&#x67;&#x65;&#46;&#x6e;&#x65;&#116;">&#x64;&#x68;&#x69;&#x65;&#x62;&#x65;&#x72;&#x74;&#64;&#117;&#x73;&#x65;&#114;&#115;&#x2e;&#115;&#x6f;&#x75;&#114;&#99;&#x65;&#x66;&#x6f;&#x72;&#x67;&#101;&#x2e;&#x6e;&#101;&#116;&lt;/a>,
+</span><span class='line'>&lt;a href="http://ctags.sourceforge.net">http://ctags.sourceforge.net&lt;/a>  Optional compiled features: +wildcards, +regex</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Indexing a directory</h3>
+
+<p>Now that we have Ctags installed, go to the root file of your code base and run the following command:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ctags -R
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The <code>-R</code> is to recurse through the subdirectories. Now there should be a tags file created in the directory. If you are using Git for version control, I recommend putting this in your global gitignore.</p>
+
+<h3>Indexing your Ruby Gems.</h3>
+
+<p>This is best done through the ruby gem <code>gem-ctags</code></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem install ctags
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And then run:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem ctags
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+This will index all the gems and you won&rsquo;t have to ever do this again. From now on whenever you install a gem, it will get automatically indexed.</p>
+
+<h3>Auto Indexing.</h3>
+
+<p>Despite the awesomeness of Ctags you might be thinking you have to always manually index a directory. Whenever you pull code from Github, merge in branches etc. This issue has been solved by <a href="http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html">the great Tim Pope</a>. The article explains how to setup auto indexing using git hooks. There is one point that I missed out, he says to make the files executable. To do that:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chmod +x file_name
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+You must do this for all the files as he states.
+Now any time you pull, merge or commit the tags file will get updated.</p>
+
+<p>However this won&rsquo;t work yet for existing repositories, you must reinitialize them with <code>git init</code> followed by <code>git ctags</code></p>
+
+<h3>Navigating.</h3>
+
+<p>With all that out of the way, on to the fun stuff. Open a file place your cursor on a word. Let&rsquo;s say you&rsquo;re in the post class and you see the word User. Navigating to that word and pressing &lt;C-]>&ldquo;control and close bracket&rdquo;, will jump you to the User class. You can keep diving deep into the code base with this. At times you can go a bit too deep,the good news is that Vim keeps a history of things. Hit <code>:tags</code> to access that.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> <span class="c"># TO tag         FROM line  in file/text</span>
+</span><span class='line'> 1  1 User                6  ~/programming/contractjobs/teen_w/app/models/crons/daily_alerts_email.rb
+</span><span class='line'> 2  1 devise              6  app/models/user.rb
+</span><span class='line'> 3  1 attr_accessible    10  app/models/user.rb
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This is my current list, you can move back and forth between this by &lt;C-o>&ldquo;control O&rdquo; and &lt;C-i>&ldquo;control i&rdquo;. As you can see I have <code>attr_accessible</code> in my list, this is a method in the rails framework. The one thing I absolutely love about Ctags is that it makes navigating your gems' source code very easy. My rails knowledge has increased really fast thanks to this. As the say, the best way to improve as a developer is too read other people&rsquo;s code.</p>
+
+<p>You can prefix the ctag command with a <code>g</code>  to get a full list of matches to choose from.
+This should be enough to get you started there are a lot of other commands <code>help ctags</code> to find out more.
+<a href="https://github.com/SublimeText/CTags">For Sublime Text users</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Receiving Email in a Rails App]]></title>
@@ -90,12 +171,12 @@ If you need to edit this route, you can paste it in your routes file.</p>
 What is a MX record?
 The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
 Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
-You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#97;&#105;&#108;&#x74;&#111;&#58;&#105;&#x6e;&#102;&#x6f;&#64;&#x79;&#x6f;&#117;&#114;&#100;&#x6f;&#x6d;&#x61;&#x69;&#x6e;&#46;&#99;&#111;&#109;&#46;">&#x69;&#x6e;&#x66;&#111;&#64;&#121;&#111;&#117;&#x72;&#100;&#111;&#x6d;&#x61;&#105;&#110;&#46;&#x63;&#111;&#109;&#x2e;</a></p>
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#58;&#x69;&#110;&#102;&#111;&#x40;&#121;&#111;&#x75;&#x72;&#100;&#x6f;&#x6d;&#97;&#x69;&#110;&#46;&#x63;&#x6f;&#x6d;&#x2e;">&#105;&#x6e;&#x66;&#x6f;&#x40;&#121;&#111;&#117;&#x72;&#x64;&#x6f;&#109;&#x61;&#x69;&#110;&#46;&#x63;&#111;&#x6d;&#x2e;</a></p>
 
 <p><img class="center" src="/images/namecheap.png"></p>
 
 <p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
-In my case this would be <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#58;&#x69;&#110;&#102;&#x6f;&#x40;&#x73;&#x68;&#x69;&#118;&#x61;&#x6d;&#100;&#97;&#114;&#x79;&#x61;&#x6e;&#x61;&#110;&#x69;&#x2e;&#99;&#111;&#109;">&#105;&#x6e;&#x66;&#111;&#64;&#115;&#104;&#x69;&#118;&#97;&#109;&#x64;&#97;&#x72;&#121;&#97;&#110;&#97;&#110;&#105;&#46;&#x63;&#111;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+In my case this would be <a href="&#109;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#x69;&#x6e;&#102;&#111;&#64;&#x73;&#104;&#x69;&#118;&#97;&#x6d;&#x64;&#x61;&#114;&#121;&#97;&#x6e;&#x61;&#110;&#x69;&#x2e;&#x63;&#x6f;&#109;">&#x69;&#x6e;&#102;&#111;&#x40;&#115;&#x68;&#105;&#x76;&#97;&#x6d;&#x64;&#x61;&#x72;&#121;&#97;&#x6e;&#97;&#x6e;&#x69;&#46;&#x63;&#x6f;&#109;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
 The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
 
 <h3>Why would I want to receive email?</h3>
@@ -912,35 +993,6 @@ There are other columns you can add to the model if needed such as permissions, 
 <p>Instead of directly passing in the params[:application] we pass the build method a method itself. This private method makes sure to only permit the application name.</p>
 
 <p>Since the output of my controllers were already in JSON there was no need for <a href="https://github.com/nesquena/rabl">RABL</a>. Also for those looking for something lightweight can have a look at <a href="https://github.com/rails-api/rails-api">Rails-API</a>. This is enough to get you started if you any questions leave comments and I shall address them.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How many lines of code is your project?]]></title>
-    <link href="http://shivamd.github.io/blog/2013/09/11/your-code-statistics/"/>
-    <updated>2013-09-11T00:34:00+04:00</updated>
-    <id>http://shivamd.github.io/blog/2013/09/11/your-code-statistics</id>
-    <content type="html"><![CDATA[<p>A client just asked me, how many lines of code is the project?
-Despite being an absurd question, and having no relation with the project at all this made me really curious to find out.
-After a quick web search, I stumbled upon this piece of code (Bare in find this is for a rails app).
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>find ./app -type f | xargs cat | wc -l</span></code></pre></td></tr></table></div></figure></notextile></div>
-What does this code do?
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>find</span></code></pre></td></tr></table></div></figure></notextile></div> is a shell method that searches through the files.
-The next part, <div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./app -type f</span></code></pre></td></tr></table></div></figure></notextile></div> searches the app directory. You can search any directory you want, this looks at the app directory which in a rails app holds majority of the code you write.
-After that you list the type you want. If you search without the type you get both directories and files. In this case we just want files, hence the &ldquo;f&rdquo;. This is an alias for &ldquo;file&rdquo;.
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>| xargs</span></code></pre></td></tr></table></div></figure></notextile></div>
-We need to use xargs over here which reads the STDIN stream data and coverts each line into space separated arguments to the command.
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cat |</span></code></pre></td></tr></table></div></figure></notextile></div>
-reads the output and pipes it out to the next step of commands
-<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>wc -l</span></code></pre></td></tr></table></div></figure></notextile></div>
-&ldquo;wc&rdquo; is short for word count. This gives 3 results. The first being the number of new lines, the second being the number of words and last the number of characters. However we are interested in the lines, hence the command &ldquo;-l&rdquo;.
-This is a cool little script to get an overview of the size of the codebase.</p>
 ]]></content>
   </entry>
   

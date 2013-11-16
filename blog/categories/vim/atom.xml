@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: vim | Shivam Daryanani's Blog]]></title>
+  <link href="http://shivamd.github.io/blog/categories/vim/atom.xml" rel="self"/>
+  <link href="http://shivamd.github.io/"/>
+  <updated>2013-11-16T23:50:30+04:00</updated>
+  <id>http://shivamd.github.io/</id>
+  <author>
+    <name><![CDATA[Shivam Daryanani]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Harnessing the Power of Ctags in Vim]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/16/harnessing-the-power-of-ctags-in-vim/"/>
+    <updated>2013-11-16T22:51:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/16/harnessing-the-power-of-ctags-in-vim</id>
+    <content type="html"><![CDATA[<p>What is Ctags? It&rsquo;s a tool that creates an index file of functions, variables, class names and so on based on the language. This makes it easy to navigate a code base, and makes you feel like a badass.</p>
+
+<h3>The setup.</h3>
+
+<p>Ctags come shipped in with MacOS but you&rsquo;ll want the exuberant Ctags.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install ctags
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>If you did the installation right, you should get the following output when running <code>ctags --version</code></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Exuberant Ctags 5.8, Copyright &copy; 1996-2009 Darren Hiebert
+</span><span class='line'>Compiled: Nov 15 2013, 00:46:27  Addresses: &lt;a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#x3a;&#100;&#x68;&#x69;&#101;&#x62;&#x65;&#x72;&#116;&#64;&#117;&#115;&#x65;&#x72;&#115;&#x2e;&#x73;&#x6f;&#x75;&#114;&#x63;&#101;&#102;&#111;&#x72;&#103;&#101;&#46;&#x6e;&#101;&#x74;">&#x64;&#104;&#105;&#101;&#98;&#x65;&#x72;&#116;&#x40;&#x75;&#115;&#x65;&#114;&#x73;&#x2e;&#x73;&#111;&#x75;&#x72;&#99;&#101;&#x66;&#111;&#114;&#103;&#x65;&#46;&#110;&#101;&#116;&lt;/a>,
+</span><span class='line'>&lt;a href="http://ctags.sourceforge.net">http://ctags.sourceforge.net&lt;/a>  Optional compiled features: +wildcards, +regex</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Indexing a directory</h3>
+
+<p>Now that we have Ctags installed, go to the root file of your code base and run the following command:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ctags -R
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The <code>-R</code> is to recurse through the subdirectories. Now there should be a tags file created in the directory. If you are using Git for version control, I recommend putting this in your global gitignore.</p>
+
+<h3>Indexing your Ruby Gems.</h3>
+
+<p>This is best done through the ruby gem <code>gem-ctags</code></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem install ctags
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And then run:
+<div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem ctags
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+This will index all the gems and you won&rsquo;t have to ever do this again. From now on whenever you install a gem, it will get automatically indexed.</p>
+
+<h3>Auto Indexing.</h3>
+
+<p>Despite the awesomeness of Ctags you might be thinking you have to always manually index a directory. Whenever you pull code from Github, merge in branches etc. This issue has been solved by <a href="http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html">the great Tim Pope</a>. The article explains how to setup auto indexing using git hooks. There is one point that I missed out, he says to make the files executable. To do that:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chmod +x file_name
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+You must do this for all the files as he states.
+Now any time you pull, merge or commit the tags file will get updated.</p>
+
+<p>However this won&rsquo;t work yet for existing repositories, you must reinitialize them with <code>git init</code> followed by <code>git ctags</code></p>
+
+<h3>Navigating.</h3>
+
+<p>With all that out of the way, on to the fun stuff. Open a file place your cursor on a word. Let&rsquo;s say you&rsquo;re in the post class and you see the word User. Navigating to that word and pressing &lt;C-]>&ldquo;control and close bracket&rdquo;, will jump you to the User class. You can keep diving deep into the code base with this. At times you can go a bit too deep,the good news is that Vim keeps a history of things. Hit <code>:tags</code> to access that.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> <span class="c"># TO tag         FROM line  in file/text</span>
+</span><span class='line'> 1  1 User                6  ~/programming/contractjobs/teen_w/app/models/crons/daily_alerts_email.rb
+</span><span class='line'> 2  1 devise              6  app/models/user.rb
+</span><span class='line'> 3  1 attr_accessible    10  app/models/user.rb
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This is my current list, you can move back and forth between this by &lt;C-o>&ldquo;control O&rdquo; and &lt;C-i>&ldquo;control i&rdquo;. As you can see I have <code>attr_accessible</code> in my list, this is a method in the rails framework. The one thing I absolutely love about Ctags is that it makes navigating your gems' source code very easy. My rails knowledge has increased really fast thanks to this. As the say, the best way to improve as a developer is too read other people&rsquo;s code.</p>
+
+<p>You can prefix the ctag command with a <code>g</code>  to get a full list of matches to choose from.
+This should be enough to get you started there are a lot of other commands <code>help ctags</code> to find out more.
+<a href="https://github.com/SublimeText/CTags">For Sublime Text users</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
