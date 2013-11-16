@@ -4,7 +4,7 @@
   <title><![CDATA[Category: vim | Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/blog/categories/vim/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-16T23:50:30+04:00</updated>
+  <updated>2013-11-16T23:55:28+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -20,6 +20,8 @@
     <id>http://shivamd.github.io/blog/2013/11/16/harnessing-the-power-of-ctags-in-vim</id>
     <content type="html"><![CDATA[<p>What is Ctags? It&rsquo;s a tool that creates an index file of functions, variables, class names and so on based on the language. This makes it easy to navigate a code base, and makes you feel like a badass.</p>
 
+<p>At times you come across a method and have no idea where in the source code it is. Imagine with a press of a command it takes you there immediately. You are writing Rails code and want to look at the documentation for let&rsquo;s say <code>validates</code>, instead of doing a google search just use Ctags! You no longer have to get scared of a large code base.</p>
+
 <h3>The setup.</h3>
 
 <p>Ctags come shipped in with MacOS but you&rsquo;ll want the exuberant Ctags.</p>
@@ -34,7 +36,7 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>Exuberant Ctags 5.8, Copyright &copy; 1996-2009 Darren Hiebert
-</span><span class='line'>Compiled: Nov 15 2013, 00:46:27  Addresses: &lt;a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#x3a;&#100;&#x68;&#x69;&#101;&#x62;&#x65;&#x72;&#116;&#64;&#117;&#115;&#x65;&#x72;&#115;&#x2e;&#x73;&#x6f;&#x75;&#114;&#x63;&#101;&#102;&#111;&#x72;&#103;&#101;&#46;&#x6e;&#101;&#x74;">&#x64;&#104;&#105;&#101;&#98;&#x65;&#x72;&#116;&#x40;&#x75;&#115;&#x65;&#114;&#x73;&#x2e;&#x73;&#111;&#x75;&#x72;&#99;&#101;&#x66;&#111;&#114;&#103;&#x65;&#46;&#110;&#101;&#116;&lt;/a>,
+</span><span class='line'>Compiled: Nov 15 2013, 00:46:27  Addresses: &lt;a href="&#x6d;&#x61;&#105;&#108;&#116;&#111;&#58;&#100;&#x68;&#x69;&#x65;&#98;&#101;&#114;&#x74;&#64;&#117;&#115;&#x65;&#x72;&#x73;&#46;&#x73;&#x6f;&#x75;&#114;&#99;&#x65;&#x66;&#111;&#x72;&#103;&#x65;&#x2e;&#110;&#x65;&#116;">&#100;&#x68;&#x69;&#x65;&#x62;&#101;&#114;&#x74;&#x40;&#117;&#x73;&#x65;&#x72;&#115;&#x2e;&#x73;&#111;&#117;&#114;&#99;&#101;&#x66;&#111;&#114;&#103;&#101;&#x2e;&#110;&#x65;&#x74;&lt;/a>,
 </span><span class='line'>&lt;a href="http://ctags.sourceforge.net">http://ctags.sourceforge.net&lt;/a>  Optional compiled features: +wildcards, +regex</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <h3>Indexing a directory</h3>
