@@ -4,7 +4,7 @@
   <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-16T23:55:28+04:00</updated>
+  <updated>2013-11-24T00:29:17+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,176 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Creating a Guest User Record with Devise]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/21/create-a-guest-user-record-with-devise/"/>
+    <updated>2013-11-21T02:04:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/21/create-a-guest-user-record-with-devise</id>
+    <content type="html"><![CDATA[<p>At times you need the user to check out your application without having to sign up. Play around with the features and if they are interested they can sign up. It&rsquo;s easy to create a guest record on visit of the page, but the difficult part is in transferring the data from the guest to the signed up user.</p>
+
+<h3>Setup</h3>
+
+<p>Assuming you have a default devise setup on a user, you need to override the <code>current_user</code> method devise provides out of the box.</p>
+
+<p>First we&rsquo;ll need to add a guest column to our user model.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rails g migration AddGuestToUser guest:boolean</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AddGuestToUser</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">change</span>
+</span><span class='line'>    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:guest</span><span class="p">,</span> <span class="ss">:boolean</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Overwrite the CurrentUser Method</h3>
+
+<figure class='code'><figcaption><span>app/controllers/application_contorller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">protect_from_forgery</span>
+</span><span class='line'>  <span class="n">before_filter</span> <span class="ss">:authenticate_user!</span>
+</span><span class='line'>  <span class="n">helper_method</span> <span class="ss">:current_user</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">current_user</span>
+</span><span class='line'>    <span class="k">super</span> <span class="o">||</span> <span class="n">guest_user</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">guest_user</span>
+</span><span class='line'>    <span class="no">User</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">session</span><span class="o">[</span><span class="ss">:guest_user_id</span><span class="o">].</span><span class="n">nil?</span> <span class="p">?</span> <span class="n">session</span><span class="o">[</span><span class="ss">:guest_user_id</span><span class="o">]</span> <span class="o">=</span> <span class="n">create_guest_user</span><span class="o">.</span><span class="n">id</span> <span class="p">:</span> <span class="n">session</span><span class="o">[</span><span class="ss">:guest_user_id</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">create_guest_user</span>
+</span><span class='line'>    <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span> <span class="p">{</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span> <span class="n">user</span><span class="o">.</span><span class="n">guest</span> <span class="o">=</span> <span class="kp">true</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="s2">&quot;guest_</span><span class="si">#{</span><span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">to_i</span><span class="si">}#{</span><span class="nb">rand</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span><span class="si">}</span><span class="s2">@example.com&quot;</span>
+</span><span class='line'>    <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="ss">:validate</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">user</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since we use the <code>current_user</code> method in our application, we default to normal behaviour. If there&rsquo;s none we create a guest_user. The logic is simple,
+if the <code>session[:guest_user_id]</code> is nil we create one otherwise we use that id itself.
+The <code>create_guest_user</code> method instantiates a user and within a block sets the guest attribute to true. The reason we do that is because guest is not accessible as an attribute and setting it normally would throw a mass assignment error.
+You probably have some logic in the navigation bar when going to the homepage, hence the guest user record gets created whenever you make your first reference to current user.</p>
+
+<h3>Transferring data to signed up user.</h3>
+
+<p>Let&rsquo;s say the user finds your application beneficial and decides to sign up. Here is the code needed to transfer the information.</p>
+
+<figure class='code'><figcaption><span>app/controllers/registrations_controller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">RegistrationsController</span> <span class="o">&lt;</span> <span class="ss">Devise</span><span class="p">:</span><span class="ss">:RegistrationsController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">new</span>
+</span><span class='line'>    <span class="k">super</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">create</span>
+</span><span class='line'>    <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:user</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="vi">@user</span><span class="o">.</span><span class="n">save</span>
+</span><span class='line'>      <span class="n">current_user</span><span class="o">.</span><span class="n">move_to</span><span class="p">(</span><span class="vi">@user</span><span class="p">)</span> <span class="k">if</span> <span class="n">current_user</span> <span class="o">&amp;&amp;</span> <span class="n">current_user</span><span class="o">.</span><span class="n">guest?</span>
+</span><span class='line'>      <span class="n">sign_up</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="vi">@user</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">redirect_to</span> <span class="n">user_root_path</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="n">render</span> <span class="ss">:new</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We want the new action to be the same, hence we call <code>super</code>. However we are overriding the create action. After saving the user we call move to on the <code>current_user</code> if they are a guest. <code>move_to</code> is a method defined on the user model.</p>
+
+<figure class='code'><figcaption><span>app/models/user.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'> <span class="c1">#user logic </span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">def</span> <span class="nf">move_to</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">todos</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span class='line'> <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'> <span class="c1">#more user logic</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this case we move all the todos to the user who has just signed up. Once that is done we sign_up the user using devise&rsquo;s built in <code>sign_up</code> method.
+You might be thinking about deleting the guest user right now, but you should not in case you have relations dependent to it. You best bet would be to create a cron that deletes the guest user&rsquo;s every 24 hours.</p>
+
+<figure class='code'><figcaption><span>lib/tasks/scheduler.rake </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">desc</span> <span class="s2">&quot;Remove guest accounts more than a week old.&quot;</span>
+</span><span class='line'><span class="n">task</span> <span class="ss">:guest_cleanup</span> <span class="o">=&gt;</span> <span class="ss">:environment</span> <span class="k">do</span>
+</span><span class='line'>  <span class="no">User</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">guest</span><span class="p">:</span> <span class="ss">:true</span><span class="p">)</span><span class="o">.</span><span class="n">destroy_all</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And there it is, guest users who can interact with your app.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Harnessing the Power of Ctags in Vim]]></title>
@@ -112,7 +282,7 @@ This should be enough to get you started there are a lot of other commands <code
     <link href="http://shivamd.github.io/blog/2013/11/14/creating-email-accounts-on-your-domain-dynamically/"/>
     <updated>2013-11-14T09:40:00+04:00</updated>
     <id>http://shivamd.github.io/blog/2013/11/14/creating-email-accounts-on-your-domain-dynamically</id>
-    <content type="html"><![CDATA[<p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#106;&#x6f;&#104;&#110;&#100;&#111;&#101;&#64;&#x6d;&#x79;&#100;&#x6f;&#109;&#x61;&#x69;&#110;&#46;&#99;&#x6f;&#109;&#46;">&#106;&#x6f;&#x68;&#110;&#x64;&#111;&#x65;&#64;&#109;&#121;&#100;&#x6f;&#109;&#97;&#x69;&#110;&#46;&#99;&#x6f;&#x6d;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
+    <content type="html"><![CDATA[<p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x6f;&#104;&#110;&#100;&#x6f;&#x65;&#64;&#109;&#x79;&#100;&#111;&#x6d;&#x61;&#x69;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x6a;&#111;&#104;&#x6e;&#100;&#x6f;&#x65;&#64;&#x6d;&#x79;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#111;&#109;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
 
 <h3>Attempt#1</h3>
 
@@ -159,7 +329,7 @@ In order to create an email forward, you will need to make a post request:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#111;&#x3a;&#x6a;&#111;&#104;&#x6e;&#64;&#x65;&#x78;&#x61;&#x6d;&#x70;&#x6c;&#101;&#x2e;&#99;&#x6f;&#x6d;">&#106;&#x6f;&#x68;&#x6e;&#x40;&#101;&#120;&#x61;&#109;&#112;&#x6c;&#x65;&#x2e;&#x63;&#111;&#109;</a> will be forwarded to <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x73;&#111;&#109;&#x65;&#x6f;&#110;&#101;&#64;&#101;&#x78;&#x61;&#x6d;&#112;&#x6c;&#101;&#46;&#x63;&#111;&#x6d;&#46;">&#x73;&#111;&#x6d;&#101;&#x6f;&#x6e;&#101;&#x40;&#x65;&#x78;&#x61;&#109;&#112;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#109;&#46;</a></p>
+<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6a;&#111;&#104;&#x6e;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#46;&#99;&#111;&#x6d;">&#x6a;&#x6f;&#x68;&#110;&#x40;&#101;&#x78;&#x61;&#109;&#112;&#108;&#101;&#x2e;&#99;&#111;&#109;</a> will be forwarded to <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x73;&#x6f;&#109;&#101;&#111;&#110;&#101;&#x40;&#x65;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;&#46;">&#115;&#x6f;&#109;&#x65;&#111;&#110;&#101;&#x40;&#101;&#120;&#97;&#x6d;&#112;&#108;&#101;&#46;&#99;&#111;&#x6d;&#46;</a></p>
 
 <p>You can send a post request with headers in a Rails app using the <code>system</code> method(you&rsquo;ll paste in the same script)  but I prefer to make a post request using the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem as it&rsquo;s cleaner. The same post request in ruby:</p>
 
@@ -351,12 +521,12 @@ If you need to edit this route, you can paste it in your routes file.</p>
 What is a MX record?
 The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
 Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
-You will also need to setup an email for your domain, by default namecheap creates an <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#x69;&#x6e;&#x66;&#x6f;&#64;&#121;&#111;&#x75;&#x72;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#46;&#x63;&#111;&#x6d;&#46;">&#105;&#x6e;&#x66;&#x6f;&#x40;&#121;&#x6f;&#117;&#x72;&#x64;&#111;&#109;&#97;&#x69;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#x2e;</a></p>
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#109;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#x69;&#x6e;&#102;&#x6f;&#64;&#x79;&#111;&#x75;&#x72;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x69;&#x6e;&#102;&#111;&#x40;&#x79;&#111;&#x75;&#114;&#100;&#111;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#x6f;&#109;&#x2e;</a></p>
 
 <p><img class="center" src="http://shivamd.github.io/images/namecheap.png"></p>
 
 <p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
-In my case this would be <a href="&#109;&#97;&#105;&#x6c;&#116;&#111;&#58;&#x69;&#x6e;&#x66;&#x6f;&#x40;&#115;&#104;&#105;&#x76;&#x61;&#x6d;&#x64;&#97;&#114;&#x79;&#x61;&#110;&#97;&#110;&#x69;&#46;&#99;&#111;&#x6d;">&#105;&#x6e;&#x66;&#111;&#x40;&#115;&#104;&#105;&#x76;&#x61;&#109;&#100;&#x61;&#114;&#121;&#97;&#x6e;&#x61;&#x6e;&#105;&#46;&#x63;&#x6f;&#109;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+In my case this would be <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x69;&#110;&#102;&#x6f;&#64;&#x73;&#x68;&#105;&#118;&#97;&#109;&#100;&#x61;&#x72;&#121;&#97;&#110;&#x61;&#x6e;&#105;&#x2e;&#99;&#111;&#109;">&#x69;&#x6e;&#102;&#111;&#x40;&#x73;&#x68;&#105;&#x76;&#97;&#x6d;&#x64;&#x61;&#x72;&#x79;&#97;&#x6e;&#97;&#110;&#105;&#x2e;&#99;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
 The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
 
 <h3>Why would I want to receive email?</h3>

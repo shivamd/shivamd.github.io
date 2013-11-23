@@ -89,7 +89,7 @@
   </header>
 
 
-<div class="entry-content"><p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#106;&#x6f;&#104;&#110;&#100;&#111;&#101;&#64;&#x6d;&#x79;&#100;&#x6f;&#109;&#x61;&#x69;&#110;&#46;&#99;&#x6f;&#109;&#46;">&#106;&#x6f;&#x68;&#110;&#x64;&#111;&#x65;&#64;&#109;&#121;&#100;&#x6f;&#109;&#97;&#x69;&#110;&#46;&#99;&#x6f;&#x6d;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
+<div class="entry-content"><p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x6f;&#104;&#110;&#100;&#x6f;&#x65;&#64;&#109;&#x79;&#100;&#111;&#x6d;&#x61;&#x69;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x6a;&#111;&#104;&#x6e;&#100;&#x6f;&#x65;&#64;&#x6d;&#x79;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#111;&#109;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
 
 <h3>Attempt#1</h3>
 
@@ -136,7 +136,7 @@ In order to create an email forward, you will need to make a post request:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#111;&#x3a;&#x6a;&#111;&#104;&#x6e;&#64;&#x65;&#x78;&#x61;&#x6d;&#x70;&#x6c;&#101;&#x2e;&#99;&#x6f;&#x6d;">&#106;&#x6f;&#x68;&#x6e;&#x40;&#101;&#120;&#x61;&#109;&#112;&#x6c;&#x65;&#x2e;&#x63;&#111;&#109;</a> will be forwarded to <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x73;&#111;&#109;&#x65;&#x6f;&#110;&#101;&#64;&#101;&#x78;&#x61;&#x6d;&#112;&#x6c;&#101;&#46;&#x63;&#111;&#x6d;&#46;">&#x73;&#111;&#x6d;&#101;&#x6f;&#x6e;&#101;&#x40;&#x65;&#x78;&#x61;&#109;&#112;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#109;&#46;</a></p>
+<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6a;&#111;&#104;&#x6e;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#46;&#99;&#111;&#x6d;">&#x6a;&#x6f;&#x68;&#110;&#x40;&#101;&#x78;&#x61;&#109;&#112;&#108;&#101;&#x2e;&#99;&#111;&#109;</a> will be forwarded to <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x73;&#x6f;&#109;&#101;&#111;&#110;&#101;&#x40;&#x65;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;&#46;">&#115;&#x6f;&#109;&#x65;&#111;&#110;&#101;&#x40;&#101;&#120;&#97;&#x6d;&#112;&#108;&#101;&#46;&#99;&#111;&#x6d;&#46;</a></p>
 
 <p>You can send a post request with headers in a Rails app using the <code>system</code> method(you&rsquo;ll paste in the same script)  but I prefer to make a post request using the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem as it&rsquo;s cleaner. The same post request in ruby:</p>
 
@@ -243,6 +243,10 @@ In order to create an email forward, you will need to make a post request:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/21/create-a-guest-user-record-with-devise/">Creating a Guest User Record With Devise</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/16/harnessing-the-power-of-ctags-in-vim/">Harnessing the Power of Ctags in Vim</a>
       </li>
     
@@ -256,10 +260,6 @@ In order to create an email forward, you will need to make a post request:</p>
     
       <li class="post">
         <a href="/blog/2013/11/07/receiving-email-in-a-rails-app/">Receiving Email in a Rails App</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/11/03/nested-attributes-in-rails-4/">Nested Attributes in Rails 4</a>
       </li>
     
   </ul>

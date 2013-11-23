@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: devise | Shivam Daryanani's Blog]]></title>
+  <link href="http://shivamd.github.io/blog/categories/devise/atom.xml" rel="self"/>
+  <link href="http://shivamd.github.io/"/>
+  <updated>2013-11-24T00:29:17+04:00</updated>
+  <id>http://shivamd.github.io/</id>
+  <author>
+    <name><![CDATA[Shivam Daryanani]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Creating a Guest User Record with Devise]]></title>
+    <link href="http://shivamd.github.io/blog/2013/11/21/create-a-guest-user-record-with-devise/"/>
+    <updated>2013-11-21T02:04:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/11/21/create-a-guest-user-record-with-devise</id>
+    <content type="html"><![CDATA[<p>At times you need the user to check out your application without having to sign up. Play around with the features and if they are interested they can sign up. It&rsquo;s easy to create a guest record on visit of the page, but the difficult part is in transferring the data from the guest to the signed up user.</p>
+
+<h3>Setup</h3>
+
+<p>Assuming you have a default devise setup on a user, you need to override the <code>current_user</code> method devise provides out of the box.</p>
+
+<p>First we&rsquo;ll need to add a guest column to our user model.
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rails g migration AddGuestToUser guest:boolean</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">AddGuestToUser</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">change</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;add_column :users, :guest, :boolean</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Overwrite the CurrentUser Method</h3>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/controllers/application_contorller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  <span class="n">protect_from_forgery</span>
+</span><span class='line'>  <span class="n">before_filter</span> <span class="ss">:authenticate_user!</span>
+</span><span class='line'>  <span class="n">helper_method</span> <span class="ss">:current_user</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  def current_user&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">super</span> <span class="o">||</span> <span class="n">guest_user</span>
+</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  private&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nf">guest_user</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;User.find(session[:guest_user_id].nil? ? session[:guest_user_id] = create_guest_user.id : session[:guest_user_id])</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nf">create_guest_user</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;user = User.new { |user| user.guest = true }</span>
+</span><span class='line'><span class="sr">user.email = &quot;guest_</span><span class="si">#{</span><span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">to_i</span><span class="si">}#{</span><span class="nb">rand</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span><span class="si">}</span><span class="sr">@example.com&quot;</span>
+</span><span class='line'><span class="sr">user.save(:validate =&amp;gt; false)</span>
+</span><span class='line'><span class="sr">user</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Since we use the <code>current_user</code> method in our application, we default to normal behaviour. If there&rsquo;s none we create a guest_user. The logic is simple,
+if the <code>session[:guest_user_id]</code> is nil we create one otherwise we use that id itself.
+The <code>create_guest_user</code> method instantiates a user and within a block sets the guest attribute to true. The reason we do that is because guest is not accessible as an attribute and setting it normally would throw a mass assignment error.
+You probably have some logic in the navigation bar when going to the homepage, hence the guest user record gets created whenever you make your first reference to current user.</p>
+
+<h3>Transferring data to signed up user.</h3>
+
+<p>Let&rsquo;s say the user finds your application beneficial and decides to sign up. Here is the code needed to transfer the information.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/controllers/registrations_controller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">RegistrationsController</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="ss">Devise</span><span class="p">:</span><span class="ss">:RegistrationsController</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">new</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;super</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nf">create</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;@user = User.new(params[:user])</span>
+</span><span class='line'><span class="sr">if @user.save</span>
+</span><span class='line'><span class="sr">  current_user.move_to(@user) if current_user &amp;amp;&amp;amp; current_user.guest?</span>
+</span><span class='line'><span class="sr">  sign_up(&quot;user&quot;, @user)</span>
+</span><span class='line'><span class="sr">  redirect_to user_root_path</span>
+</span><span class='line'><span class="sr">else</span>
+</span><span class='line'><span class="sr">  render :new</span>
+</span><span class='line'><span class="sr">end</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>We want the new action to be the same, hence we call <code>super</code>. However we are overriding the create action. After saving the user we call move to on the <code>current_user</code> if they are a guest. <code>move_to</code> is a method defined on the user model.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>app/models/user.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'> <span class="c1">#user logic&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span> <span class="k">def</span> <span class="nf">move_to</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">todos</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span class='line'> <span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt; #more user logic</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>In this case we move all the todos to the user who has just signed up. Once that is done we sign_up the user using devise&rsquo;s built in <code>sign_up</code> method.
+You might be thinking about deleting the guest user right now, but you should not in case you have relations dependent to it. You best bet would be to create a cron that deletes the guest user&rsquo;s every 24 hours.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>lib/tasks/scheduler.rake </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">desc</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="no">Remove</span> <span class="n">guest</span> <span class="n">accounts</span> <span class="n">more</span> <span class="n">than</span> <span class="n">a</span> <span class="n">week</span> <span class="n">old</span><span class="o">.</span><span class="n">&amp;rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">task</span> <span class="ss">:guest_cleanup</span> <span class="o">=&gt;</span> <span class="ss">:environment</span> <span class="k">do</span>
+</span><span class='line'>  <span class="no">User</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">guest</span><span class="p">:</span> <span class="ss">:true</span><span class="p">)</span><span class="o">.</span><span class="n">destroy_all</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And there it is, guest users who can interact with your app.</p>
+]]></content>
+  </entry>
+  
+</feed>
