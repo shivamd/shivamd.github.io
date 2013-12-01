@@ -4,7 +4,7 @@
   <title><![CDATA[Shivam Daryanani's Blog]]></title>
   <link href="http://shivamd.github.io/atom.xml" rel="self"/>
   <link href="http://shivamd.github.io/"/>
-  <updated>2013-11-24T00:29:17+04:00</updated>
+  <updated>2013-12-01T19:51:58+04:00</updated>
   <id>http://shivamd.github.io/</id>
   <author>
     <name><![CDATA[Shivam Daryanani]]></name>
@@ -12,6 +12,61 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Infinite Scroll]]></title>
+    <link href="http://shivamd.github.io/blog/2013/12/01/simple-infinite-scroll/"/>
+    <updated>2013-12-01T18:23:00+04:00</updated>
+    <id>http://shivamd.github.io/blog/2013/12/01/simple-infinite-scroll</id>
+    <content type="html"><![CDATA[<p>A lot of websites use infinite scroll including Facebook&amp;Twitter. There are a lot of Ruby Gems that help in implementing this but it&rsquo;s rather simple to create your own with Javascript and avoid adding another gem to your app.</p>
+
+<p>Let&rsquo;s say we have a <code>ul</code> with a id of <code>videos</code>, inside this there are a lot of <code>li</code> tags that contain title&rsquo;s of videos.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;ul</span> <span class="na">id=</span><span class="s">&quot;videos&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 1<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 2<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 3<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 4<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 5<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="c">&lt;!-- more videos --&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We want to detect when a user hit&rsquo;s the bottom of these videos and make a call to grab more videos.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='coffeescript'><span class='line'><span class="nv">checkVideoScroll = </span><span class="nf">(e) -&gt;</span>
+</span><span class='line'>  <span class="nv">element = </span><span class="nx">$</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span><span class="p">())</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">element</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">scrollHeight</span> <span class="o">-</span> <span class="nx">element</span><span class="p">.</span><span class="nx">scrollTop</span><span class="p">()</span> <span class="o">==</span> <span class="nx">element</span><span class="p">.</span><span class="nx">outerHeight</span><span class="p">()</span>
+</span><span class='line'>    <span class="c1">#make call to get more videos</span>
+</span><span class='line'><span class="nx">$</span> <span class="nf">-&gt;</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s">&quot;.videos&quot;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s">&quot;scroll&quot;</span><span class="p">,</span> <span class="nx">checkVideoScroll</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When the document loads we set a scroll listener on the list of videos. When a user scrolls down, we call the <code>checkVideoScroll</code> method. On the first line the method assigns element to be the current target, which in this case is the <code>ul</code>.
+The <code>scrollHeight</code> is the height of the element including content not visible on the screen. The <code>scrollTop()</code> gets the scroll top offset of the element. The <code>outerHeight()</code> is a jQuery method that returns the visible portion of the scrollable element.
+<img class="center" src="http://shivamd.github.io/images/scroll.jpg"></p>
+
+<p>As you can see once the user scrolls all the way to the bottom, <code>scrollHeight - scrollTop()</code> will equal the <code>outerHeight()</code> and that&rsquo;s when we make a call to get more videos.</p>
+
+<p>As you can see infinite scroll is simple with jQuery.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating a Guest User Record with Devise]]></title>
@@ -282,7 +337,7 @@ This should be enough to get you started there are a lot of other commands <code
     <link href="http://shivamd.github.io/blog/2013/11/14/creating-email-accounts-on-your-domain-dynamically/"/>
     <updated>2013-11-14T09:40:00+04:00</updated>
     <id>http://shivamd.github.io/blog/2013/11/14/creating-email-accounts-on-your-domain-dynamically</id>
-    <content type="html"><![CDATA[<p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x6f;&#104;&#110;&#100;&#x6f;&#x65;&#64;&#109;&#x79;&#100;&#111;&#x6d;&#x61;&#x69;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x6a;&#111;&#104;&#x6e;&#100;&#x6f;&#x65;&#64;&#x6d;&#x79;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#111;&#109;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
+    <content type="html"><![CDATA[<p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#58;&#106;&#x6f;&#104;&#110;&#100;&#111;&#101;&#x40;&#109;&#x79;&#x64;&#111;&#109;&#97;&#x69;&#110;&#x2e;&#99;&#x6f;&#109;&#46;">&#x6a;&#x6f;&#104;&#x6e;&#100;&#111;&#101;&#64;&#109;&#x79;&#100;&#x6f;&#x6d;&#x61;&#x69;&#x6e;&#x2e;&#x63;&#x6f;&#x6d;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
 
 <h3>Attempt#1</h3>
 
@@ -329,7 +384,7 @@ In order to create an email forward, you will need to make a post request:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6a;&#111;&#104;&#x6e;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#46;&#99;&#111;&#x6d;">&#x6a;&#x6f;&#x68;&#110;&#x40;&#101;&#x78;&#x61;&#109;&#112;&#108;&#101;&#x2e;&#99;&#111;&#109;</a> will be forwarded to <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x73;&#x6f;&#109;&#101;&#111;&#110;&#101;&#x40;&#x65;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;&#46;">&#115;&#x6f;&#109;&#x65;&#111;&#110;&#101;&#x40;&#101;&#120;&#97;&#x6d;&#112;&#108;&#101;&#46;&#99;&#111;&#x6d;&#46;</a></p>
+<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#106;&#x6f;&#104;&#x6e;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6c;&#101;&#46;&#99;&#x6f;&#x6d;">&#x6a;&#111;&#104;&#110;&#x40;&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#101;&#x2e;&#x63;&#111;&#x6d;</a> will be forwarded to <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#115;&#111;&#109;&#101;&#111;&#110;&#x65;&#x40;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#x65;&#46;&#99;&#x6f;&#109;&#46;">&#x73;&#111;&#109;&#101;&#x6f;&#110;&#x65;&#64;&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#46;&#x63;&#x6f;&#x6d;&#46;</a></p>
 
 <p>You can send a post request with headers in a Rails app using the <code>system</code> method(you&rsquo;ll paste in the same script)  but I prefer to make a post request using the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem as it&rsquo;s cleaner. The same post request in ruby:</p>
 
@@ -521,12 +576,12 @@ If you need to edit this route, you can paste it in your routes file.</p>
 What is a MX record?
 The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
 Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
-You will also need to setup an email for your domain, by default namecheap creates an <a href="&#109;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#x69;&#x6e;&#102;&#x6f;&#64;&#x79;&#111;&#x75;&#x72;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x69;&#x6e;&#102;&#111;&#x40;&#x79;&#111;&#x75;&#114;&#100;&#111;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#x6f;&#109;&#x2e;</a></p>
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#105;&#x6e;&#x66;&#x6f;&#64;&#121;&#x6f;&#117;&#x72;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#x2e;&#x63;&#111;&#x6d;&#x2e;">&#x69;&#110;&#x66;&#x6f;&#64;&#x79;&#111;&#x75;&#x72;&#x64;&#111;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#111;&#x6d;&#x2e;</a></p>
 
 <p><img class="center" src="http://shivamd.github.io/images/namecheap.png"></p>
 
 <p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
-In my case this would be <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x69;&#110;&#102;&#x6f;&#64;&#x73;&#x68;&#105;&#118;&#97;&#109;&#100;&#x61;&#x72;&#121;&#97;&#110;&#x61;&#x6e;&#105;&#x2e;&#99;&#111;&#109;">&#x69;&#x6e;&#102;&#111;&#x40;&#x73;&#x68;&#105;&#x76;&#97;&#x6d;&#x64;&#x61;&#x72;&#x79;&#97;&#x6e;&#97;&#110;&#105;&#x2e;&#99;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+In my case this would be <a href="&#x6d;&#x61;&#105;&#108;&#116;&#111;&#x3a;&#x69;&#110;&#x66;&#111;&#x40;&#x73;&#104;&#105;&#x76;&#x61;&#x6d;&#x64;&#97;&#114;&#x79;&#97;&#x6e;&#97;&#110;&#105;&#46;&#99;&#111;&#x6d;">&#105;&#x6e;&#x66;&#111;&#x40;&#115;&#104;&#x69;&#118;&#x61;&#x6d;&#100;&#97;&#x72;&#121;&#97;&#110;&#x61;&#x6e;&#x69;&#46;&#99;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
 The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
 
 <h3>Why would I want to receive email?</h3>

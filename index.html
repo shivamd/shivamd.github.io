@@ -9,7 +9,7 @@
   <meta name="author" content="Shivam Daryanani">
 
   
-  <meta name="description" content="At times you need the user to check out your application without having to sign up. Play around with the features and if they are interested they can &hellip;">
+  <meta name="description" content="A lot of websites use infinite scroll including Facebook&amp;Twitter. There are a lot of Ruby Gems that help in implementing this but it&rsquo;s &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,88 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/01/simple-infinite-scroll/">Simple Infinite Scroll</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-01T18:23:00+04:00" pubdate data-updated="true">Dec 1<span>st</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A lot of websites use infinite scroll including Facebook&amp;Twitter. There are a lot of Ruby Gems that help in implementing this but it&rsquo;s rather simple to create your own with Javascript and avoid adding another gem to your app.</p>
+
+<p>Let&rsquo;s say we have a <code>ul</code> with a id of <code>videos</code>, inside this there are a lot of <code>li</code> tags that contain title&rsquo;s of videos.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;ul</span> <span class="na">id=</span><span class="s">&quot;videos&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 1<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 2<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 3<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 4<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;video&quot;</span><span class="nt">&gt;</span>YouTube Video 5<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="c">&lt;!-- more videos --&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We want to detect when a user hit&rsquo;s the bottom of these videos and make a call to grab more videos.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='coffeescript'><span class='line'><span class="nv">checkVideoScroll = </span><span class="nf">(e) -&gt;</span>
+</span><span class='line'>  <span class="nv">element = </span><span class="nx">$</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span><span class="p">())</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">element</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">scrollHeight</span> <span class="o">-</span> <span class="nx">element</span><span class="p">.</span><span class="nx">scrollTop</span><span class="p">()</span> <span class="o">==</span> <span class="nx">element</span><span class="p">.</span><span class="nx">outerHeight</span><span class="p">()</span>
+</span><span class='line'>    <span class="c1">#make call to get more videos</span>
+</span><span class='line'><span class="nx">$</span> <span class="nf">-&gt;</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s">&quot;.videos&quot;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s">&quot;scroll&quot;</span><span class="p">,</span> <span class="nx">checkVideoScroll</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When the document loads we set a scroll listener on the list of videos. When a user scrolls down, we call the <code>checkVideoScroll</code> method. On the first line the method assigns element to be the current target, which in this case is the <code>ul</code>.
+The <code>scrollHeight</code> is the height of the element including content not visible on the screen. The <code>scrollTop()</code> gets the scroll top offset of the element. The <code>outerHeight()</code> is a jQuery method that returns the visible portion of the scrollable element.
+<img class="center" src="/images/scroll.jpg"></p>
+
+<p>As you can see once the user scrolls all the way to the bottom, <code>scrollHeight - scrollTop()</code> will equal the <code>outerHeight()</code> and that&rsquo;s when we make a call to get more videos.</p>
+
+<p>As you can see infinite scroll is simple with jQuery.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -410,7 +492,7 @@ This should be enough to get you started there are a lot of other commands <code
   </header>
 
 
-  <div class="entry-content"><p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x6f;&#104;&#110;&#100;&#x6f;&#x65;&#64;&#109;&#x79;&#100;&#111;&#x6d;&#x61;&#x69;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x6a;&#111;&#104;&#x6e;&#100;&#x6f;&#x65;&#64;&#x6d;&#x79;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#111;&#109;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
+  <div class="entry-content"><p>For an app I am working on, I needed to create an email account on my domain based on the user&rsquo;s input. For example the user signed up as &lsquo;johndoe&rsquo;, I had to create an email for them <a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#58;&#106;&#x6f;&#104;&#110;&#100;&#111;&#101;&#x40;&#109;&#x79;&#x64;&#111;&#109;&#97;&#x69;&#110;&#x2e;&#99;&#x6f;&#109;&#46;">&#x6a;&#x6f;&#104;&#x6e;&#100;&#111;&#101;&#64;&#109;&#x79;&#100;&#x6f;&#x6d;&#x61;&#x69;&#x6e;&#x2e;&#x63;&#x6f;&#x6d;&#46;</a> Initially I thought this would be difficult, but it turned out to be simple thanks to <a href="http://dnsimple.com">DNSimple</a>.</p>
 
 <h3>Attempt#1</h3>
 
@@ -457,7 +539,7 @@ In order to create an email forward, you will need to make a post request:</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6a;&#111;&#104;&#x6e;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#46;&#99;&#111;&#x6d;">&#x6a;&#x6f;&#x68;&#110;&#x40;&#101;&#x78;&#x61;&#109;&#112;&#108;&#101;&#x2e;&#99;&#111;&#109;</a> will be forwarded to <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x73;&#x6f;&#109;&#101;&#111;&#110;&#101;&#x40;&#x65;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;&#46;">&#115;&#x6f;&#109;&#x65;&#111;&#110;&#101;&#x40;&#101;&#120;&#97;&#x6d;&#112;&#108;&#101;&#46;&#99;&#111;&#x6d;&#46;</a></p>
+<p>This time we have an additional header, setting the content-type to be JSON as we will be sending JSON. We also need to specify a post request, which is indicated by -X. Finally we have to send the data with -d. All emails that get sent to <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#106;&#x6f;&#104;&#x6e;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6c;&#101;&#46;&#99;&#x6f;&#x6d;">&#x6a;&#111;&#104;&#110;&#x40;&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#101;&#x2e;&#x63;&#111;&#x6d;</a> will be forwarded to <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#115;&#111;&#109;&#101;&#111;&#110;&#x65;&#x40;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#x65;&#46;&#99;&#x6f;&#109;&#46;">&#x73;&#111;&#109;&#101;&#x6f;&#110;&#x65;&#64;&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#46;&#x63;&#x6f;&#x6d;&#46;</a></p>
 
 <p>You can send a post request with headers in a Rails app using the <code>system</code> method(you&rsquo;ll paste in the same script)  but I prefer to make a post request using the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem as it&rsquo;s cleaner. The same post request in ruby:</p>
 
@@ -703,12 +785,12 @@ If you need to edit this route, you can paste it in your routes file.</p>
 What is a MX record?
 The full form is Mail Exchanger record. It specifies how email should be routed for a particular domain. It specifies a mail server, in this case sendgrid, for accepting emails for your domain.
 Go to your domain settings and create a MX record which points to mx.sendgrid.net. An example for <a href="http://namecheap.com">Namecheap</a> would look like this.
-You will also need to setup an email for your domain, by default namecheap creates an <a href="&#109;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#x69;&#x6e;&#102;&#x6f;&#64;&#x79;&#111;&#x75;&#x72;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#46;&#x63;&#x6f;&#x6d;&#46;">&#x69;&#x6e;&#102;&#111;&#x40;&#x79;&#111;&#x75;&#114;&#100;&#111;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#x6f;&#109;&#x2e;</a></p>
+You will also need to setup an email for your domain, by default namecheap creates an <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#105;&#x6e;&#x66;&#x6f;&#64;&#121;&#x6f;&#117;&#x72;&#x64;&#x6f;&#x6d;&#x61;&#x69;&#110;&#x2e;&#x63;&#111;&#x6d;&#x2e;">&#x69;&#110;&#x66;&#x6f;&#64;&#x79;&#111;&#x75;&#x72;&#x64;&#111;&#x6d;&#x61;&#x69;&#110;&#x2e;&#99;&#111;&#x6d;&#x2e;</a></p>
 
 <p><img class="center" src="/images/namecheap.png"></p>
 
 <p>And that&rsquo;s it! Start your rails server along with ngrok or a localtunnel. Give it a go send an email to the address you created in the domain settings.
-In my case this would be <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x69;&#110;&#102;&#x6f;&#64;&#x73;&#x68;&#105;&#118;&#97;&#109;&#100;&#x61;&#x72;&#121;&#97;&#110;&#x61;&#x6e;&#105;&#x2e;&#99;&#111;&#109;">&#x69;&#x6e;&#102;&#111;&#x40;&#x73;&#x68;&#105;&#x76;&#97;&#x6d;&#x64;&#x61;&#x72;&#x79;&#97;&#x6e;&#97;&#110;&#105;&#x2e;&#99;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
+In my case this would be <a href="&#x6d;&#x61;&#105;&#108;&#116;&#111;&#x3a;&#x69;&#110;&#x66;&#111;&#x40;&#x73;&#104;&#105;&#x76;&#x61;&#x6d;&#x64;&#97;&#114;&#x79;&#97;&#x6e;&#97;&#110;&#105;&#46;&#99;&#111;&#x6d;">&#105;&#x6e;&#x66;&#111;&#x40;&#115;&#104;&#x69;&#118;&#x61;&#x6d;&#100;&#97;&#x72;&#121;&#97;&#110;&#x61;&#x6e;&#x69;&#46;&#99;&#x6f;&#x6d;</a> and boom you should have received a post message from Sendgrid. You would want to put a debugger inside the method to play around with email object that Griddler gives you.
 The SendGrid API expects a 200 response from your endpoint. If it doesn&rsquo;t get it or if your site is down, it tries up to 3 times in set intervals until it reaches your app. Which is great if your site is under maintenance.</p>
 
 <h3>Why would I want to receive email?</h3>
@@ -1583,67 +1665,6 @@ This is a cool little script to get an overview of the size of the codebase.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/08/24/advice-to-people-learning-how-to-code/">Advice to People Learning How to Code</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-08-24T01:37:00+04:00" pubdate data-updated="true">Aug 24<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>There is a lot of advice thrown out there to people who are just starting out to learn how to program. The learning never stops. It&rsquo;s been a crazy journey over the past two years, from spending countless hours alone trying to learn things by myself. To enrolling into a <a href="http://bloc.io">Bloc</a> course and then finally the intensive 12 weeks of <a href="http://devbootcamp.com">Dev Bootcamp</a>. Now I am a contract web developer who is tackling challenging problems, learning new things on a daily basis and loving every moment of it.</p>
-
-<p>So what is my piece of advice? Build things. There is no secret formula, book or programming language. The only way to improve is to build things. I don&rsquo;t care what programming language you use (<a href="http://www.ruby-lang.org/en/">Ruby</a> is awesome), just build things. Half baked things, things people would use or things you want to use. Basically anything!</p>
-
-<p>I&rsquo;ll be honest with you. I wasted the starting months while learning. I kept devouring new books, latest challenges of <a href="http://codecademy.com">codecademy</a> and anything that kept me away from uncertainty. This just filled my ego. I wasn&rsquo;t progressing as a programmer, I was just getting comfortable with syntax. I was lying to myself that I was improving. The bottom line is, the only way to improve is to build things.</p>
-
-<h3>I have a lot of time but I don&rsquo;t know what to build.</h3>
-
-<p>Stop feeding yourself excuses. You use a lot of websites on a daily basis. How about build a clone of it? Try exercising different muscles.
-Want some ideas?</p>
-
-<ul>
-<li>  <a href="http://www.dreamincode.net/forums/topic/78802-martyr2s-mega-project-ideas-list/">Martyr2&rsquo;S Mega Project Ideas List</a></li>
-<li>  <a href="http://jenniferdewalt.com/">180 websites in 180 days</a></li>
-</ul>
-
-
-<p>Your task over here is not to make money with these things, I am not saying you can&rsquo;t, but your main focus should be to get as much experience under your belt as possible.</p>
-
-<h3>I don&rsquo;t have enough time.</h3>
-
-<p>Lies. If this really matters to you, you will find time. Skip an episode of your favorite TV show, don&rsquo;t go out for that movie or cancel a night out. Carve out a set time couple of times a week, more if you can. And just code. Think of it as an appointment that you can&rsquo;t miss, nothing else matters during those hours.</p>
-
-<p>You are not doing this to get a job or to make your <a href="http://github.com">github</a> look impressive. It can, but your main objective here is to get better at coding. The idea here is to level up, tackle areas you are unfamiliar about and embrace the uncertainty. It&rsquo;s very easy to keep building things that don&rsquo;t stretch your skill level.</p>
-
-<p>Go code. Don&rsquo;t think about writing code, just code.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1659,6 +1680,10 @@ Want some ideas?</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/12/01/simple-infinite-scroll/">Simple Infinite Scroll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/21/create-a-guest-user-record-with-devise/">Creating a Guest User Record With Devise</a>
       </li>
     
@@ -1672,10 +1697,6 @@ Want some ideas?</p>
     
       <li class="post">
         <a href="/blog/2013/11/09/create-dynamic-cron-jobs-in-rails/">Creating Dynamic Cron Jobs in Rails</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/11/07/receiving-email-in-a-rails-app/">Receiving Email in a Rails App</a>
       </li>
     
   </ul>
